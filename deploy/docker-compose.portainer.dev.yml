@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  portainer:
+    command: -H unix:///var/run/docker.sock
+    container_name: portainer
+    restart: on-failure:3
+    ports:
+      - 6020:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  portainer-vol:
+    name: portainer-vol

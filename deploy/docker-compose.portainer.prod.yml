@@ -1,0 +1,48 @@
+version: '3.5'
+
+services:
+  agent:
+    image: portainer/agent
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.{{.Service.Name}}
+      AGENT_PORT: 9001
+      LOG_LEVEL: error
+    deploy:
+      mode: global
+  portainer:
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - 9000
+    networks:
+      - traefik-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.port: "9000"
+        traefik.docker.network: traefik-net
+        traefik.frontend.rule: Host:portainer.${PUBLIC_HOSTNAME}
+        traefik.backend: portainer
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+networks:
+  traefik-net:
+    external: true
+
+volumes:
+  portainer-vol:
+    name: portainer-vol
+    driver: "cloudstor:aws"
+    driver_opts:
+      backing: relocatable
+      size: 1
+      ebstype: gp2

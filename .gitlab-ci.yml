@@ -1,0 +1,89 @@
+stages:
+  - deploy
+
+deploy-portainer-dev:
+  stage: deploy
+  image: redmic/docker-gitlab
+  variables:
+    DOCKER_DRIVER: overlay2
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: portainer
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-portainer-pro:
+  stage: deploy
+  image: redmic/docker-gitlab
+  variables:
+    DOCKER_DRIVER: overlay2
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: portainer
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.prod.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual
+
+deploy-pgadmin-dev:
+  stage: deploy
+  image: redmic/docker-gitlab
+  variables:
+    DOCKER_DRIVER: overlay2
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: pgadmin
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PGADMIN_SETUP_EMAIL=${PGADMIN_SETUP_EMAIL}
+      PGADMIN_SETUP_PASSWORD=${PGADMIN_SETUP_PASSWORD} MAIL_USER=${MAIL_USER} MAIL_PASSWORD=${MAIL_PASSWORD}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-traefik-pro:
+  stage: deploy
+  image: redmic/docker-gitlab
+  variables:
+    DOCKER_DRIVER: overlay2
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: traefik
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.prod.yml
+  services:
+    - docker:dind
+  script:
+    - echo "${CERT_FILE}" > deploy/certFile.cert
+    - echo "${KEY_FILE}" > deploy/keyFile.key
+    - create-nets.sh redmic-net traefik-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+      UI_AUTH=${UI_AUTH}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual

@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+  portainer:
+    image: portainer/portainer:${IMAGE_TAG:-latest}
+    networks:
+      - redmic-net
+    volumes:
+      - portainer-vol:/data
+
+networks:
+  redmic-net:
+    external: true
