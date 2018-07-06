@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  artifactory:
+    container_name: artifactory
+    restart: on-failure:3
+    ports:
+      - 7080:8081
+
+volumes:
+  artifactory-vol:
+    name: artifactory-vol
