@@ -6,3 +6,7 @@ services:
     restart: on-failure:3
     ports:
       - ${RAINLOOP_PORT}:8888
+
+volumes:
+  mail-rainloop-vol:
+    name: mail-rainloop-vol

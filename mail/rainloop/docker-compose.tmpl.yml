@@ -5,6 +5,8 @@ services:
     image: hardware/rainloop:${IMAGE_TAG:-latest}
     networks:
       - mail-net
+    volumes:
+      - mail-rainloop-vol:/rainloop/data
 
 networks:
   mail-net:
