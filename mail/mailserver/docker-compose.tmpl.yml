@@ -11,6 +11,8 @@ services:
       - mail-mailserver-vol:/var/mail
       - /etc/letsencrypt:/etc/letsencrypt
     environment:
+      - REDIS_HOST=mail-redis
+      - DBHOST=mail-mariadb
       - DBPASS # MariaDB database password (required)
       - RSPAMD_PASSWORD # Rspamd WebUI password (required)
     # - ADD_DOMAINS=aa.tld, www.bb.tld... # Add additional domains separated by commas (needed for dkim keys etc.)
