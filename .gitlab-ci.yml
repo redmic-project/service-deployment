@@ -64,6 +64,73 @@ deploy-grafana-pro:
     - master
   when: manual
 
+deploy-mail-server-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh mail-net
+    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mariadb IMAGE_TAG=10.2
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD=${DB_PASSWORD}
+    - export DEPLOY_DIR_NAME=mail/redis SERVICE=redis IMAGE_TAG=4.0-alpine
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mailserver IMAGE_TAG=1.1-latest
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
+      DBPASS=${DB_PASSWORD}
+  environment:
+    name: dev/rspamd
+    url: https://spam.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-mail-admin-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: mail/postfixadmin
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: postfixadmin
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-mail-client-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: mail/rainloop
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: rainloop
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://webmail.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
 deploy-pgadmin-dev:
   stage: deploy
   variables:

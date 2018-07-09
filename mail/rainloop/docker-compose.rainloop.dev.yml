@@ -1,0 +1,8 @@
+version: '3.5'
+
+services:
+  rainloop:
+    container_name: email-rainloop
+    restart: on-failure:3
+    ports:
+      - ${RAINLOOP_PORT}:8888

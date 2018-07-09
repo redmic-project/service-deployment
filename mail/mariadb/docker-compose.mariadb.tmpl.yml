@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  mariadb:
+    image: mariadb:${IMAGE_TAG:-latest}
+    networks:
+      - mail-net
+    volumes:
+      - mariadb-vol:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE=postfix
+      - MYSQL_USER=postfix
+      - MYSQL_PASSWORD
+
+networks:
+  mail-net:
+    external: true

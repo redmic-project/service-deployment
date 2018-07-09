@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  rainloop:
+    image: hardware/rainloop:${IMAGE_TAG:-latest}
+    networks:
+      - mail-net
+
+networks:
+  mail-net:
+    external: true

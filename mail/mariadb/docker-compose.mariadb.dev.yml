@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  mariadb:
+    container_name: email-mariadb
+    restart: on-failure:3
+
+volumes:
+  mariadb-vol:
+    name: mariadb-vol

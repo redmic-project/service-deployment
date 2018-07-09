@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  postfixadmin:
+    image: hardware/postfixadmin:${IMAGE_TAG:-latest}
+    domainname: redmic.net
+    hostname: mail
+    networks:
+      - mail-net
+    environment:
+      - DBPASS
+
+networks:
+  mail-net:
+    external: true
