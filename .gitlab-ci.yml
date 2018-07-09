@@ -69,18 +69,23 @@ deploy-mail-server-dev:
   variables:
     DOCKER_DRIVER: overlay2
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
   services:
     - docker:dind
   script:
     - create-nets.sh mail-net
-    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mariadb IMAGE_TAG=10.2
+    - >
+      export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mariadb IMAGE_TAG=10.2
+      COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       MYSQL_PASSWORD=${DB_PASSWORD}
-    - export DEPLOY_DIR_NAME=mail/redis SERVICE=redis IMAGE_TAG=4.0-alpine
+    - >
+      export DEPLOY_DIR_NAME=mail/redis SERVICE=redis IMAGE_TAG=4.0-alpine
+      COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mailserver IMAGE_TAG=1.1-latest
+    - >
+      export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mailserver IMAGE_TAG=1.1-latest
+      COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
       DBPASS=${DB_PASSWORD}
