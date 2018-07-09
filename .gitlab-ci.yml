@@ -7,6 +7,7 @@ deploy-artifactory-dev:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: artifactory
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: artifactory
     IMAGE_TAG: latest
@@ -23,10 +24,51 @@ deploy-artifactory-dev:
     - dev
   when: manual
 
+deploy-grafana-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: grafana
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: grafana
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-grafana-pro:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: grafana
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: grafana
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.prod.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual
+
 deploy-pgadmin-dev:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: pgadmin
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: pgadmin
     IMAGE_TAG: latest
@@ -48,6 +90,7 @@ deploy-portainer-dev:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: portainer
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: portainer
     IMAGE_TAG: latest
@@ -67,8 +110,49 @@ deploy-portainer-pro:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: portainer
     SSH_REMOTE: ${PRO_SSH_REMOTE}
     SERVICE: portainer
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.prod.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual
+
+deploy-prometheus-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: prometheus
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: prometheus
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-prometheus-pro:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: prometheus
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: prometheus
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.prod.yml
   services:
@@ -86,6 +170,7 @@ deploy-traefik-pro:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${PRO_SSH_REMOTE}
     SERVICE: traefik
     IMAGE_TAG: latest

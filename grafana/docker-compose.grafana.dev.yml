@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  grafana:
+    container_name: grafana
+    restart: on-failure:3
+    ports:
+      - ${GRAFANA_PORT}:3000
+
+volumes:
+  grafana-vol:
+    name: grafana-vol
