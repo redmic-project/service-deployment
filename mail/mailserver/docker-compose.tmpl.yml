@@ -1,14 +1,14 @@
 version: '3.5'
 
 services:
-  mailserver:
+  mail-mailserver:
     image: hardware/mailserver:${IMAGE_TAG:-latest}
     domainname: redmic.es # Mail server A/MX/FQDN & reverse PTR = mail.domain.tld.
     hostname: mail
     networks:
       - mail-net
     volumes:
-      - mailserver-vol:/var/mail
+      - mail-mailserver-vol:/var/mail
       - /etc/letsencrypt:/etc/letsencrypt
     environment:
       - DBPASS # MariaDB database password (required)

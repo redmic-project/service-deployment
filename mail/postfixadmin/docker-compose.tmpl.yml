@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  postfixadmin:
+  mail-postfixadmin:
     image: hardware/postfixadmin:${IMAGE_TAG:-latest}
     domainname: redmic.net
     hostname: mail

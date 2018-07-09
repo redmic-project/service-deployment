@@ -1,8 +1,8 @@
 version: '3.5'
 
 services:
-  mailserver:
-    container_name: email-server
+  mail-mailserver:
+    container_name: mail-mailserver
     restart: on-failure:3
     ports:
       - 25:25 # SMTP - Required
@@ -16,5 +16,5 @@ services:
       - ${RSPAMD_PORT}:${RSPAMD_PORT}
 
 volumes:
-  mailserver-vol:
-    name: mailserver-vol
+  mail-mailserver-vol:
+    name: mail-mailserver-vol

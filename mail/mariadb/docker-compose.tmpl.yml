@@ -1,12 +1,12 @@
 version: '3.5'
 
 services:
-  mariadb:
+  mail-mariadb:
     image: mariadb:${IMAGE_TAG:-latest}
     networks:
       - mail-net
     volumes:
-      - mariadb-vol:/var/lib/mysql
+      - mail-mariadb-vol:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE=postfix

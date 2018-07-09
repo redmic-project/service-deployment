@@ -69,20 +69,18 @@ deploy-mail-server-dev:
   variables:
     DOCKER_DRIVER: overlay2
     SSH_REMOTE: ${DEV_SSH_REMOTE}
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
     - create-nets.sh mail-net
-    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mariadb IMAGE_TAG=10.2
-    - export COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mail-mariadb IMAGE_TAG=10.2
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       MYSQL_PASSWORD=${DB_PASSWORD}
-    - export DEPLOY_DIR_NAME=mail/redis SERVICE=redis IMAGE_TAG=4.0-alpine
-    - export COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    - export DEPLOY_DIR_NAME=mail/redis SERVICE=mail-redis IMAGE_TAG=4.0-alpine
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mailserver IMAGE_TAG=1.1-latest
-    - export COMPOSE_FILE=docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mail-mailserver IMAGE_TAG=1.1-latest
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
       DBPASS=${DB_PASSWORD}
@@ -99,16 +97,16 @@ deploy-mail-admin-dev:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: mail/postfixadmin
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: postfixadmin
+    SERVICE: mail-postfixadmin
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
   environment:
-    name: dev/${SERVICE}
-    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+    name: dev/postfixadmin
+    url: https://postfixadmin.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev
   when: manual
@@ -119,15 +117,15 @@ deploy-mail-client-dev:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: mail/rainloop
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: rainloop
+    SERVICE: mail-rainloop
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
   environment:
-    name: dev/${SERVICE}
+    name: dev/rainloop
     url: https://webmail.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev

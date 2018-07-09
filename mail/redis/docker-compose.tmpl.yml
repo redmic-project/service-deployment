@@ -1,13 +1,13 @@
 version: '3.5'
 
 services:
-  redis:
+  mail-redis:
     image: redis:${IMAGE_TAG:-latest}
     command: redis-server --appendonly yes
     networks:
       - mail-net
     volumes:
-      - redis-vol:/data
+      - mail-redis-vol:/data
 
 networks:
   mail-net:
