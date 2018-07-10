@@ -3,16 +3,16 @@ version: '3.5'
 services:
   mail-mailserver:
     image: hardware/mailserver:${IMAGE_TAG:-latest}
-    domainname: redmic.es # Mail server A/MX/FQDN & reverse PTR = mail.domain.tld.
-    hostname: mail
+    domainname: ${DOMAIN_NAME} # Mail server A/MX/FQDN & reverse PTR = mail.domain.tld.
+    #hostname: mail
     networks:
       - mail-net
     volumes:
       - mail-mailserver-vol:/var/mail
       - /etc/letsencrypt:/etc/letsencrypt
     environment:
-      - REDIS_HOST=mail-redis
-      - DBHOST=mail-mariadb
+      - REDIS_HOST
+      - DBHOST
       - DBPASS # MariaDB database password (required)
       - RSPAMD_PASSWORD # Rspamd WebUI password (required)
     # - ADD_DOMAINS=aa.tld, www.bb.tld... # Add additional domains separated by commas (needed for dkim keys etc.)

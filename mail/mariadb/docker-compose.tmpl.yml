@@ -9,8 +9,8 @@ services:
       - mail-mariadb-vol:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE=postfix
-      - MYSQL_USER=postfix
+      - MYSQL_DATABASE
+      - MYSQL_USER
       - MYSQL_PASSWORD
 
 networks:
