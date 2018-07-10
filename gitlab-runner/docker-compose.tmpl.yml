@@ -18,7 +18,7 @@ services:
       --docker-memory ${RUNNER_DOCKER_MEMORY} \
       --docker-memory-swap ${RUNNER_DOCKER_MEMORY_SWAP} \
       --docker-memory-reservation ${RUNNER_DOCKER_MEMORY_RESERVATION} \
-      --docker-cpuset-cpus "${RUNNER_DOCKER_CPUSET_CPUS} \
+      --docker-cpuset-cpus ${RUNNER_DOCKER_CPUSET_CPUS} \
       --cache-type "s3" \
       --cache-s3-server-address ${RUNNER_CACHE_S3_SERVER_ADDRESS} \
       --cache-s3-access-key "${MINIO_ACCESS_KEY}" \
