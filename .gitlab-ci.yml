@@ -36,6 +36,7 @@ deploy-gitlab-runner-dev:
   services:
     - docker:dind
   script:
+    - create-nets.sh gitlab-net
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RUNNER_TOKEN=${RUNNER_TOKEN}
       MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
