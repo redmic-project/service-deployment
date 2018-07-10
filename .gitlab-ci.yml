@@ -38,7 +38,7 @@ deploy-gitlab-runner-dev:
   script:
     - create-nets.sh gitlab-net
     - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RUNNER_TOKEN=${RUNNER_TOKEN}
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_TOKEN=${GITLAB_TOKEN}
       MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
   environment:
     name: dev/${SERVICE}
