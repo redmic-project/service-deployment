@@ -1,0 +1,6 @@
+version: '3.5'
+
+services:
+  gitlab-runner:
+    container_name: gitlab-runner
+    restart: on-failure:3

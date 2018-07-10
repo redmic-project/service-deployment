@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
+    networks:
+      - gitlab-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config.toml:/etc/gitlab-runner/config.toml
+    environment:
+      - RUNNER_TOKEN
+      - MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY
+
+networks:
+  gitlab-net:
+    external: true
