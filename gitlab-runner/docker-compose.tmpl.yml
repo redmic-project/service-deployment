@@ -3,29 +3,32 @@ version: '3.5'
 services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
-    command: |
-      gitlab-runner register \
-      --url ${GITLAB_URL} \
-      --registration-token ${GITLAB_TOKEN} \
-      --name "${RUNNER_NAME}" \
-      --output_limit ${RUNNER_OUTPUT_LIMIT} \
-      --executor "docker" \
-      --docker-image "alpine" \
-      --docker-tlsverify "false" \
-      --docker-privileged "true" \
-      --docker-disable-cache "true" \
-      --docker-shm-size ${RUNNER_DOCKER_SHM_SIZE} \
-      --docker-memory ${RUNNER_DOCKER_MEMORY} \
-      --docker-memory-swap ${RUNNER_DOCKER_MEMORY_SWAP} \
-      --docker-memory-reservation ${RUNNER_DOCKER_MEMORY_RESERVATION} \
-      --docker-cpuset-cpus ${RUNNER_DOCKER_CPUSET_CPUS} \
-      --cache-type "s3" \
-      --cache-s3-server-address ${RUNNER_CACHE_S3_SERVER_ADDRESS} \
-      --cache-s3-access-key "${MINIO_ACCESS_KEY}" \
-      --cache-s3-secret-key "${MINIO_SECRET_KEY}" \
-      --cache-s3-bucket-name "${RUNNER_CACHE_S3_BUCKET_NAME}" \
-      --cache-s3-insecure "false" \
-      --cache-cache-shared "true"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        gitlab-runner register \
+          --url ${GITLAB_URL} \
+          --registration-token ${GITLAB_TOKEN} \
+          --name "${RUNNER_NAME}" \
+          --output_limit ${RUNNER_OUTPUT_LIMIT} \
+          --executor "docker" \
+          --docker-image "alpine" \
+          --docker-tlsverify "false" \
+          --docker-privileged "true" \
+          --docker-disable-cache "true" \
+          --docker-shm-size ${RUNNER_DOCKER_SHM_SIZE} \
+          --docker-memory ${RUNNER_DOCKER_MEMORY} \
+          --docker-memory-swap ${RUNNER_DOCKER_MEMORY_SWAP} \
+          --docker-memory-reservation ${RUNNER_DOCKER_MEMORY_RESERVATION} \
+          --docker-cpuset-cpus ${RUNNER_DOCKER_CPUSET_CPUS} \
+          --cache-type "s3" \
+          --cache-s3-server-address ${RUNNER_CACHE_S3_SERVER_ADDRESS} \
+          --cache-s3-access-key "${MINIO_ACCESS_KEY}" \
+          --cache-s3-secret-key "${MINIO_SECRET_KEY}" \
+          --cache-s3-bucket-name "${RUNNER_CACHE_S3_BUCKET_NAME}" \
+          --cache-s3-insecure "false" \
+          --cache-cache-shared "true"
     networks:
       - gitlab-net
     volumes:
