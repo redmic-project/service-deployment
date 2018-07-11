@@ -3,8 +3,8 @@ version: '3.5'
 services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
-    command: |
-      register
+    command: register
+    tty: true
     networks:
       - gitlab-net
     volumes:
