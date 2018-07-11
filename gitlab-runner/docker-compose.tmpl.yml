@@ -4,9 +4,6 @@ services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
     command: |
-      run
-        --user=gitlab-runner
-        --working-directory=/home/gitlab-runner ;
       register
     networks:
       - gitlab-net
