@@ -3,8 +3,9 @@ version: '3.5'
 services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
+    entrypoint: /bin/sh
     command: >
-      /bin/sh -c "
+      -c "
         gitlab-runner register ;
         gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner"
     networks:
