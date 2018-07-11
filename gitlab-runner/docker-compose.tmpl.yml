@@ -16,7 +16,7 @@ services:
     environment:
       - REGISTER_NON_INTERACTIVE=true
       - CI_SERVER_URL=${GITLAB_URL}
-      - CI_SERVER_TOKEN=${GITLAB_TOKEN}
+      - REGISTRATION_TOKEN=${GITLAB_TOKEN}
       - RUNNER_NAME
       - RUNNER_OUTPUT_LIMIT
       - RUNNER_EXECUTOR
