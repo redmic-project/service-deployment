@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  minio:
+    container_name: minio
+    restart: on-failure:3
+    ports:
+      - ${MINIO_PORT}:9000
+
+volumes:
+  minio-vol:
+    name: minio-vol

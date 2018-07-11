@@ -153,6 +153,28 @@ deploy-mail-client-dev:
     - dev
   when: manual
 
+deploy-minio-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: minio
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: minio
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
 deploy-pgadmin-dev:
   stage: deploy
   variables:
