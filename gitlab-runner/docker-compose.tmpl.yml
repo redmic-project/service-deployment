@@ -3,7 +3,7 @@ version: '3.5'
 services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
-    command: |
+    command: >
       register ;
       run --user=gitlab-runner --working-directory=/home/gitlab-runner
     networks:
