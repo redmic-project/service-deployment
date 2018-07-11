@@ -15,6 +15,7 @@ services:
       - ./config:/etc/gitlab-runner
     environment:
       - REGISTER_NON_INTERACTIVE=true
+      - REGISTER_LOCKED=false
       - CI_SERVER_URL=${GITLAB_URL}
       - REGISTRATION_TOKEN=${GITLAB_TOKEN}
       - RUNNER_NAME
