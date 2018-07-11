@@ -3,9 +3,11 @@ version: '3.5'
 services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
-    entrypoint: /bin/sh -c
     command: |
-      gitlab-runner register \
+      run \
+        --user=gitlab-runner \
+        --working-directory=/home/gitlab-runner
+      register \
         --url "${GITLAB_URL}" \
         --registration-token "${GITLAB_TOKEN}" \
         --name "${RUNNER_NAME}" \
