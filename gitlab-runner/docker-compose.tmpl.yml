@@ -4,10 +4,8 @@ services:
   gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
     command:
-      - >
-        register
-      - >
-        run --user=gitlab-runner --working-directory=/home/gitlab-runner
+      - gitlab-runner register
+      - gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
     networks:
       - gitlab-net
     volumes:
