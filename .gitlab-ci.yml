@@ -102,7 +102,7 @@ deploy-mail-server-dev:
       MYSQL_PASSWORD=${DB_PASSWORD}
     - export DEPLOY_DIR_NAME=mail/redis SERVICE=mail-redis IMAGE_TAG=4.0-alpine
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mail-mailserver IMAGE_TAG=1.1-latest
+    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mail-mailserver IMAGE_TAG=1.1-stable
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
       DBPASS=${DB_PASSWORD}
