@@ -5,7 +5,7 @@ services:
     container_name: mail-rainloop
     restart: on-failure:3
     ports:
-      - ${RAINLOOP_PORT}:8888
+      - "${RAINLOOP_PORT}:8888"
 
 volumes:
   mail-rainloop-vol:
