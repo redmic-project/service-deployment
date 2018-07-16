@@ -4,12 +4,11 @@ services:
   mail-mailserver:
     image: hardware/mailserver:${IMAGE_TAG:-latest}
     domainname: ${DOMAIN_NAME} # Mail server A/MX/FQDN & reverse PTR = mail.domain.tld.
-    hostname: mail-mailserver
+    hostname: ${HOST_NAME}
     networks:
       - mail-net
     volumes:
       - mail-mailserver-vol:/var/mail
-    # - ${CERTIFICATES_PATH}:/etc/letsencrypt/live/mail-mailserver.${DOMAIN_NAME}
     environment:
       - REDIS_HOST
       - DBHOST

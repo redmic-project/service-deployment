@@ -7,6 +7,8 @@ services:
       - mail-net
     volumes:
       - mail-rainloop-vol:/rainloop/data
+    environment:
+      - LOG_TO_STDOUT
 
 networks:
   mail-net:
