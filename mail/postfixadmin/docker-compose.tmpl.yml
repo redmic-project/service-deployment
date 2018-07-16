@@ -4,12 +4,13 @@ services:
   mail-postfixadmin:
     image: hardware/postfixadmin:${IMAGE_TAG:-latest}
     domainname: ${DOMAIN_NAME}
-    hostname: ${HOST_NAME}
+    hostname: mail-postfixadmin
     networks:
       - mail-net
     environment:
       - DBHOST
       - DBPASS
+      - SMTPHOST
 
 networks:
   mail-net:
