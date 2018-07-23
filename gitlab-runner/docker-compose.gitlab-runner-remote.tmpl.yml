@@ -19,7 +19,7 @@ services:
       - REGISTER_NON_INTERACTIVE=true
       - REGISTER_LOCKED=false
       - REGISTER_RUN_UNTAGGED=true
-      - REGISTER_TAG_LIST
+      - RUNNER_TAG_LIST
       - RUNNER_NAME
       - RUNNER_OUTPUT_LIMIT
       - RUNNER_EXECUTOR
