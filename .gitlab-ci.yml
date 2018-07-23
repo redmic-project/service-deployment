@@ -38,8 +38,33 @@ deploy-gitlab-runner-dev:
   script:
     - create-nets.sh gitlab-net
     - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_TOKEN=${OAGDEV_GITLAB_TOKEN}
+      MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+  environment:
+    name: dev/${SERVICE}
+  only:
+    - dev
+  when: manual
+
+deploy-gitlab-runner-remote:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: gitlab-runner
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: gitlab-runner
+    IMAGE_TAG: alpine
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    GITLAB_URL: https://gitlab.com/
+    RUNNER_NAME: REDMIC runner for gitlab.com
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh gitlab-net
+    - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_TOKEN=${GITLAB_TOKEN}
       MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      GITLAB_URL=${GITLAB_URL} RUNNER_NAME=${RUNNER_NAME}
   environment:
     name: dev/${SERVICE}
   only:
