@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  gitlab-runner:
+  gitlab-runner-remote:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
     entrypoint: /bin/sh
     command: >
@@ -12,7 +12,7 @@ services:
       - gitlab-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config:/etc/gitlab-runner
+      - ./config-remote:/etc/gitlab-runner
     environment:
       - REGISTER_NON_INTERACTIVE=true
       - REGISTER_LOCKED=false

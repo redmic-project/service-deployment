@@ -24,22 +24,26 @@ deploy-artifactory-dev:
     - dev
   when: manual
 
-deploy-gitlab-runner-dev:
+deploy-gitlab-runner-local:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: gitlab-runner
+    SERVICE: gitlab-runner-local
     IMAGE_TAG: alpine
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    COMPOSE_FILE: docker-compose.gitlab-runner-local.tmpl.yml:docker-compose.gitlab-runner-local.dev.yml
+    GITLAB_URL: https://git.redmic.net
+    GITLAB_TOKEN: ${OAGDEV_GITLAB_TOKEN}
+    RUNNER_NAME: OAGDev runner
   services:
     - docker:dind
   script:
     - create-nets.sh gitlab-net
     - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_TOKEN=${OAGDEV_GITLAB_TOKEN}
-      MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
+      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      RUNNER_NAME="${RUNNER_NAME}"
   environment:
     name: dev/${SERVICE}
   only:
@@ -52,19 +56,20 @@ deploy-gitlab-runner-remote:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: gitlab-runner
+    SERVICE: gitlab-runner-remote
     IMAGE_TAG: alpine
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-    GITLAB_URL: https://gitlab.com/
-    RUNNER_NAME: REDMIC runner for gitlab.com
+    COMPOSE_FILE: docker-compose.gitlab-runner-remote.tmpl.yml:docker-compose.gitlab-runner-remote.dev.yml
+    GITLAB_URL: https://gitlab.com
+    GITLAB_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
+    RUNNER_NAME: GitLab.com runner
   services:
     - docker:dind
   script:
     - create-nets.sh gitlab-net
     - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_TOKEN=${GITLAB_TOKEN}
-      MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      GITLAB_URL=${GITLAB_URL} RUNNER_NAME=${RUNNER_NAME}
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
+      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      RUNNER_NAME="${RUNNER_NAME}"
   environment:
     name: dev/${SERVICE}
   only:
