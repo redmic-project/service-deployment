@@ -14,10 +14,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./config-remote:/etc/gitlab-runner
     environment:
-      - REGISTER_NON_INTERACTIVE=true
-      - REGISTER_LOCKED=false
       - CI_SERVER_URL=${GITLAB_URL}
       - REGISTRATION_TOKEN=${GITLAB_TOKEN}
+      - REGISTER_NON_INTERACTIVE=true
+      - REGISTER_LOCKED=false
+      - REGISTER_RUN_UNTAGGED=true
+      - REGISTER_TAG_LIST
       - RUNNER_NAME
       - RUNNER_OUTPUT_LIMIT
       - RUNNER_EXECUTOR
