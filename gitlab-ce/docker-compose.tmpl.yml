@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  gitlab-ce:
+    image: gitlab/gitlab-ce:${IMAGE_TAG:-latest}
+    networks:
+      - gitlab-net
+    volumes:
+      - gitlab-ce-config-vol:/etc/gitlab
+      - gitlab-ce-log-vol:/var/log/gitlab
+      - gitlab-ce-data-vol:/var/opt/gitlab
+
+networks:
+  gitlab-net:
+    external: true

@@ -24,6 +24,37 @@ deploy-artifactory-dev:
     - dev
   when: manual
 
+deploy-gitlab-ce-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: gitlab-ce
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: gitlab-ce
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    AWS_REGION: ${OAGDEV_GITLAB_AWS_REGION}
+    AWS_ACCESS_KEY_ID: ${OAGDEV_GITLAB_AWS_ACCESS_KEY}
+    AWS_SECRET_ACCESS_KEY: ${OAGDEV_GITLAB_AWS_SECRET_KEY}
+    SMTP_ADDR: ${OAGDEV_GITLAB_SMTP_ADDR}
+    SMTP_USER: ${OAGDEV_GITLAB_SMTP_USER}
+    SMTP_PASS: ${OAGDEV_GITLAB_SMTP_PASS}
+    SMTP_DOMAIN: ${OAGDEV_GITLAB_SMTP_DOMAIN}
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh gitlab-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} AWS_REGION=${AWS_REGION}
+      AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} SMTP_ADDR=${SMTP_ADDR}
+      SMTP_USER=${SMTP_USER} SMTP_PASS=${SMTP_PASS} SMTP_DOMAIN=${SMTP_DOMAIN}
+  environment:
+    name: dev/${SERVICE}
+    url: https://git.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
 deploy-gitlab-runner-local:
   stage: deploy
   variables:

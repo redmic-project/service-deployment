@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+  gitlab-ce:
+    container_name: gitlab-ce
+    hostname: ${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}
+    restart: on-failure:3
+    ports:
+      - "${GITLAB_SSH_PORT}:22"
+      - "${GITLAB_HTTPS_PORT}:443"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url '${GITLAB_PROTOCOL}://${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}'
+        registry_external_url '${GITLAB_PROTOCOL}://${GITLAB_REGISTRY_SUBDOMAIN}.${GITLAB_DOMAIN}'
+        gitlab_rails['registry_enabled'] = true
+        web_server['external_users'] = ['www-data']
+        gitlab_rails['backup_keep_time'] = 604800
+        gitlab_rails['backup_upload_connection'] = {
+           'provider' => 'AWS',
+           'region' => "${AWS_REGION}",
+           'aws_access_key_id' => "${AWS_ACCESS_KEY_ID}",
+           'aws_secret_access_key' => "${AWS_SECRET_ACCESS_KEY}"
+        }
+        gitlab_rails['backup_upload_remote_directory'] = 'gitlab.bkp'
+        gitlab_rails['db_port'] = 5432
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "${SMTP_ADDR}"
+        gitlab_rails['smtp_port'] = 25
+        gitlab_rails['smtp_user_name'] = "${SMTP_USER}"
+        gitlab_rails['smtp_password'] = "${SMTP_PASS}"
+        gitlab_rails['smtp_domain'] = "${SMTP_DOMAIN}"
+        gitlab_rails['smtp_authentication'] = "plain"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        unicorn['port'] = 8090
+
+volumes:
+  gitlab-ce-config-vol:
+    name: gitlab-ce-config-vol
+  gitlab-ce-log-vol:
+    name: gitlab-ce-log-vol
+  gitlab-ce-data-vol:
+    name: gitlab-ce-data-vol
