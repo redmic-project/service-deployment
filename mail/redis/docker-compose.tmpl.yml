@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  mail-redis:
+    image: redis:${IMAGE_TAG:-latest}
+    command: redis-server --appendonly yes
+    networks:
+      - mail-net
+    volumes:
+      - mail-redis-vol:/data
+
+networks:
+  mail-net:
+    external: true

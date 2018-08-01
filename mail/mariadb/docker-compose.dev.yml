@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  mail-mariadb:
+    container_name: mail-mariadb
+    restart: on-failure:3
+
+volumes:
+  mail-mariadb-vol:
+    name: mail-mariadb-vol

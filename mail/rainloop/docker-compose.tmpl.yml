@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  mail-rainloop:
+    image: hardware/rainloop:${IMAGE_TAG:-latest}
+    networks:
+      - mail-net
+    volumes:
+      - mail-rainloop-vol:/rainloop/data
+    environment:
+      - LOG_TO_STDOUT
+
+networks:
+  mail-net:
+    external: true

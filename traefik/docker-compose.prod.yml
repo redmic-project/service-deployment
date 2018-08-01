@@ -2,25 +2,12 @@ version: '3.5'
 
 services:
   traefik:
-    image: traefik:${IMAGE_TAG:-latest}
-    command:
-      - "--api"
-      - "--logLevel=ERROR"
-      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
-      - "--defaultentrypoints=http,https"
-      - "--docker"
-      - "--docker.swarmmode"
-      - "--docker.domain=traefik"
-      - "--docker.watch"
     ports:
       - 80:80
       - 443:443
     networks:
-      - redmic-net
       - traefik-net
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./certFile.cert:/ssl/certFile.cert
       - ./keyFile.key:/ssl/keyFile.key
     deploy:
@@ -40,7 +27,5 @@ services:
         max_attempts: 3
 
 networks:
-  redmic-net:
-    external: true
   traefik-net:
     external: true

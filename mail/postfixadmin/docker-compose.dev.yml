@@ -1,0 +1,8 @@
+version: '3.5'
+
+services:
+  mail-postfixadmin:
+    container_name: mail-postfixadmin
+    restart: on-failure:3
+    ports:
+      - "${POSTFIXADMIN_PORT}:8888"

@@ -1,0 +1,21 @@
+version: '3.5'
+
+services:
+  mail-mailserver:
+    image: hardware/mailserver:${IMAGE_TAG:-latest}
+    domainname: ${DOMAIN_NAME}
+    hostname: ${HOST_NAME}
+    networks:
+      - mail-net
+    volumes:
+      - mail-mailserver-vol:/var/mail
+    environment:
+      - REDIS_HOST
+      - DBHOST
+      - DBPASS
+      - RSPAMD_PASSWORD
+      - ADD_DOMAINS
+
+networks:
+  mail-net:
+    external: true

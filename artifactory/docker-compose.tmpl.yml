@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-oss:${IMAGE_TAG:-latest}
+    networks:
+      - redmic-net
+    volumes:
+      - artifactory-vol:/var/opt/jfrog/artifactory
+
+networks:
+  redmic-net:
+    external: true

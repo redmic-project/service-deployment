@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+  minio:
+    image: minio/minio:${IMAGE_TAG:-latest}
+    command: server /export
+    networks:
+      - redmic-net
+    volumes:
+      - minio-vol:/export
+    environment:
+      - MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY
+
+networks:
+  redmic-net:
+    external: true

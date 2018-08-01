@@ -1,0 +1,6 @@
+version: '3.5'
+
+services:
+  gitlab-runner-remote:
+    container_name: gitlab-runner-remote
+    restart: on-failure:3

@@ -1,0 +1,45 @@
+version: '3.5'
+
+services:
+  gitlab-runner-local:
+    image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
+    entrypoint: /bin/sh
+    command: >
+      -c "
+        gitlab-runner register ;
+        gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner"
+    networks:
+      - gitlab-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config-local:/etc/gitlab-runner
+    environment:
+      - CI_SERVER_URL=${GITLAB_URL}
+      - REGISTRATION_TOKEN=${GITLAB_TOKEN}
+      - REGISTER_NON_INTERACTIVE=true
+      - REGISTER_LOCKED=false
+      - REGISTER_RUN_UNTAGGED=true
+      - RUNNER_TAG_LIST
+      - RUNNER_NAME
+      - RUNNER_OUTPUT_LIMIT
+      - RUNNER_EXECUTOR
+      - DOCKER_IMAGE=${RUNNER_DOCKER_IMAGE}
+      - DOCKER_TLS_VERIFY=${RUNNER_DOCKER_TLS_VERIFY}
+      - DOCKER_PRIVILEGED=${RUNNER_DOCKER_PRIVILEGED}
+      - DOCKER_DISABLE_CACHE=${RUNNER_DOCKER_DISABLE_CACHE}
+      - DOCKER_SHM_SIZE=${RUNNER_DOCKER_SHM_SIZE}
+      - DOCKER_MEMORY=${RUNNER_DOCKER_MEMORY}
+      - DOCKER_MEMORY_SWAP=${RUNNER_DOCKER_MEMORY_SWAP}
+      - DOCKER_MEMORY_RESERVATION=${RUNNER_DOCKER_MEMORY_RESERVATION}
+      - DOCKER_CPUSET_CPUS=${RUNNER_DOCKER_CPUSET_CPUS}
+      - CACHE_TYPE=${RUNNER_CACHE_TYPE}
+      - CACHE_SHARED=${RUNNER_CACHE_SHARED}
+      - S3_SERVER_ADDRESS=${MINIO_URL}
+      - S3_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - S3_SECRET_KEY=${MINIO_SECRET_KEY}
+      - S3_BUCKET_NAME=${RUNNER_S3_BUCKET_NAME}
+      - S3_CACHE_INSECURE=${RUNNER_S3_CACHE_INSECURE}
+
+networks:
+  gitlab-net:
+    external: true

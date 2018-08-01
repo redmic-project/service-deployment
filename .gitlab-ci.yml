@@ -1,15 +1,122 @@
 stages:
   - deploy
 
-deploy-portainer-dev:
+image: redmic/docker-gitlab
+
+deploy-artifactory-dev:
   stage: deploy
-  image: redmic/docker-gitlab
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: artifactory
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: portainer
+    SERVICE: artifactory
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-gitlab-ce-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: gitlab-ce
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: gitlab-ce
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    AWS_REGION: ${OAGDEV_GITLAB_AWS_REGION}
+    AWS_ACCESS_KEY_ID: ${OAGDEV_GITLAB_AWS_ACCESS_KEY}
+    AWS_SECRET_ACCESS_KEY: ${OAGDEV_GITLAB_AWS_SECRET_KEY}
+    SMTP_ADDR: ${OAGDEV_GITLAB_SMTP_ADDR}
+    SMTP_USER: ${OAGDEV_GITLAB_SMTP_USER}
+    SMTP_PASS: ${OAGDEV_GITLAB_SMTP_PASS}
+    SMTP_DOMAIN: ${OAGDEV_GITLAB_SMTP_DOMAIN}
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh gitlab-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} AWS_REGION=${AWS_REGION}
+      AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} SMTP_ADDR=${SMTP_ADDR}
+      SMTP_USER=${SMTP_USER} SMTP_PASS=${SMTP_PASS} SMTP_DOMAIN=${SMTP_DOMAIN}
+  environment:
+    name: dev/${SERVICE}
+    url: https://git.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-gitlab-runner-local:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: gitlab-runner
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: gitlab-runner-local
+    IMAGE_TAG: alpine
+    COMPOSE_FILE: docker-compose.gitlab-runner-local.tmpl.yml:docker-compose.gitlab-runner-local.dev.yml
+    GITLAB_URL: https://git.redmic.net
+    GITLAB_TOKEN: ${OAGDEV_GITLAB_TOKEN}
+    RUNNER_NAME: OAGDev runner
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh gitlab-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
+      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      RUNNER_NAME="${RUNNER_NAME}"
+  environment:
+    name: dev/${SERVICE}
+  only:
+    - dev
+  when: manual
+
+deploy-gitlab-runner-remote:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: gitlab-runner
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: gitlab-runner-remote
+    IMAGE_TAG: alpine
+    COMPOSE_FILE: docker-compose.gitlab-runner-remote.tmpl.yml:docker-compose.gitlab-runner-remote.dev.yml
+    GITLAB_URL: https://gitlab.com
+    GITLAB_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
+    RUNNER_NAME: GitLab.com runner
+    RUNNER_TAG_LIST: client,functional
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh gitlab-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
+      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      RUNNER_NAME="${RUNNER_NAME}" RUNNER_TAG_LIST=${RUNNER_TAG_LIST}
+  environment:
+    name: dev/${SERVICE}
+  only:
+    - dev
+  when: manual
+
+deploy-grafana-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: grafana
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: grafana
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
@@ -21,15 +128,15 @@ deploy-portainer-dev:
     - dev
   when: manual
 
-deploy-portainer-pro:
+deploy-grafana-pro:
   stage: deploy
-  image: redmic/docker-gitlab
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: grafana
     SSH_REMOTE: ${PRO_SSH_REMOTE}
-    SERVICE: portainer
+    SERVICE: grafana
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.prod.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
   services:
     - docker:dind
   script:
@@ -41,15 +148,104 @@ deploy-portainer-pro:
     - master
   when: manual
 
-deploy-pgadmin-dev:
+deploy-mail-server-dev:
   stage: deploy
-  image: redmic/docker-gitlab
   variables:
     DOCKER_DRIVER: overlay2
     SSH_REMOTE: ${DEV_SSH_REMOTE}
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - create-nets.sh mail-net
+    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mail-mariadb IMAGE_TAG=10.2
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD=${DB_PASSWORD}
+    - export DEPLOY_DIR_NAME=mail/redis SERVICE=mail-redis IMAGE_TAG=4.0-alpine
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mail-mailserver IMAGE_TAG=1.1-latest
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
+      DBPASS=${DB_PASSWORD}
+  environment:
+    name: dev/rspamd
+    url: https://spam.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-mail-admin-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: mail/postfixadmin
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: mail-postfixadmin
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
+  environment:
+    name: dev/postfixadmin
+    url: https://postfixadmin.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-mail-client-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: mail/rainloop
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: mail-rainloop
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/rainloop
+    url: https://webmail.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-minio-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: minio
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: minio
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-pgadmin-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: pgadmin
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: pgadmin
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.tmpl.yml:docker-compose.${SERVICE}.dev.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
@@ -63,15 +259,95 @@ deploy-pgadmin-dev:
     - dev
   when: manual
 
-deploy-traefik-pro:
+deploy-portainer-dev:
   stage: deploy
-  image: redmic/docker-gitlab
   variables:
     DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: portainer
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: portainer
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-portainer-pro:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: portainer
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: portainer
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual
+
+deploy-prometheus-dev:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: prometheus
+    SSH_REMOTE: ${DEV_SSH_REMOTE}
+    SERVICE: prometheus
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+  environment:
+    name: dev/${SERVICE}
+    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+  only:
+    - dev
+  when: manual
+
+deploy-prometheus-pro:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: prometheus
+    SSH_REMOTE: ${PRO_SSH_REMOTE}
+    SERVICE: prometheus
+    IMAGE_TAG: latest
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
+  services:
+    - docker:dind
+  script:
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+  environment:
+    name: pro/${SERVICE}
+    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+  only:
+    - master
+  when: manual
+
+deploy-traefik-pro:
+  stage: deploy
+  variables:
+    DOCKER_DRIVER: overlay2
+    DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${PRO_SSH_REMOTE}
     SERVICE: traefik
     IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.${SERVICE}.prod.yml
+    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
   services:
     - docker:dind
   script:

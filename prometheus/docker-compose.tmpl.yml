@@ -1,0 +1,20 @@
+version: '3.5'
+
+services:
+  prometheus:
+    image: prom/prometheus:${IMAGE_TAG:-latest}
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=7d'
+    networks:
+      - redmic-net
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-vol:/prometheus
+
+networks:
+  redmic-net:
+    external: true

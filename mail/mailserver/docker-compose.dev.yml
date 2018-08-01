@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+  mail-mailserver:
+    container_name: mail-mailserver
+    restart: on-failure:3
+    ports:
+      - "25:25"
+      - "143:143"
+      - "587:587"
+      - "993:993"
+      - "4190:4190"
+      - "${RSPAMD_PORT}:${RSPAMD_PORT}"
+
+volumes:
+  mail-mailserver-vol:
+    name: mail-mailserver-vol

@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+  mail-postfixadmin:
+    image: hardware/postfixadmin:${IMAGE_TAG:-latest}
+    domainname: ${DOMAIN_NAME}
+    hostname: ${HOST_NAME}
+    networks:
+      - mail-net
+    environment:
+      - SMTPHOST
+      - DBHOST
+      - DBPASS
+
+networks:
+  mail-net:
+    external: true
