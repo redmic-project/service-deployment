@@ -351,8 +351,8 @@ deploy-traefik-pro:
   services:
     - docker:dind
   script:
-    - echo "${CERT_FILE}" > deploy/certFile.cert
-    - echo "${KEY_FILE}" > deploy/keyFile.key
+    - echo "${CERT_FILE}" > "${DEPLOY_DIR_NAME}/certFile.cert"
+    - echo "${KEY_FILE}" > "${DEPLOY_DIR_NAME}/keyFile.key"
     - create-nets.sh redmic-net traefik-net
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
