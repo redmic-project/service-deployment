@@ -93,7 +93,7 @@ deploy-gitlab-runner-remote:
     GITLAB_URL: https://gitlab.com
     GITLAB_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
     RUNNER_NAME: GitLab.com runner
-    RUNNER_TAG_LIST: client,functional
+    RUNNER_TAG_LIST: client,functional,oagdev
   services:
     - docker:dind
   script:
