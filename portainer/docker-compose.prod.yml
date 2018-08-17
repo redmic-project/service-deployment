@@ -4,7 +4,7 @@ services:
   agent:
     image: portainer/agent
     networks:
-      - traefik-net
+      - redmic-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -14,7 +14,7 @@ services:
     deploy:
       mode: global
   portainer:
-    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    command: -H tcp://tasks.portainer_agent:9001 --tlsskipverify
     networks:
       - traefik-net
     deploy:
