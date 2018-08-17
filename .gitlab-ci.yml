@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-image: redmic/docker-gitlab
+image: registry.gitlab.com/redmic-project/docker/docker-deploy
 
 deploy-artifactory-dev:
   stage: deploy
@@ -285,7 +285,8 @@ deploy-portainer-pro:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: portainer
     SSH_REMOTE: ${PRO_SSH_REMOTE}
-    SERVICE: portainer
+    STACK: portainer
+    SERVICES_TO_CHECK: portainer_agent portainer_portainer
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
   services:
@@ -325,7 +326,8 @@ deploy-prometheus-pro:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: prometheus
     SSH_REMOTE: ${PRO_SSH_REMOTE}
-    SERVICE: prometheus
+    STACK: prometheus
+    SERVICES_TO_CHECK: prometheus_prometheus
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
   services:
@@ -345,7 +347,8 @@ deploy-traefik-pro:
     DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${PRO_SSH_REMOTE}
-    SERVICE: traefik
+    STACK: traefik
+    SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
   services:
