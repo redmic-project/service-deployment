@@ -5,37 +5,13 @@ services:
     image: traefik:${IMAGE_TAG:-latest}
     command:
       - "--api"
-      - "--logLevel=ERROR"
-      - "--configfile=/etc/traefik/traefik.toml"
-      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
-      - "--defaultentrypoints=http,https"
       - "--docker"
-      - "--docker.swarmmode"
       - "--docker.domain=traefik"
       - "--docker.watch"
-    configs:
-      - source: traefik-config
-        target: /etc/traefik/traefik.toml
-    secrets:
-      - source: certFile-secret
-        target: /ssl/certFile.cert
-      - source: keyFile-secret
-        target: /ssl/keyFile.key
     networks:
       - redmic-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
-configs:
-  traefik-config:
-    file: ./traefik.toml
-
-secrets:
-  certFile-secret:
-    file: ./certFile.cert
-  keyFile-secret:
-    file: ./keyFile.key
 
 networks:
   redmic-net:

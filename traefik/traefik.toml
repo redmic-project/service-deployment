@@ -1,4 +1,0 @@
-[backends]
-  [backends.web-error]
-    [backends.web-error.servers.web-error]
-    url = "http://50x.redmic.s3-website-eu-west-1.amazonaws.com"
