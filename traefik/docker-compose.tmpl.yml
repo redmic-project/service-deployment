@@ -6,6 +6,7 @@ services:
     command:
       - "--api"
       - "--logLevel=ERROR"
+      - "--configfile=/etc/traefik/traefik.toml"
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
       - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
       - "--defaultentrypoints=http,https"
