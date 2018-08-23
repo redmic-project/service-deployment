@@ -9,6 +9,7 @@ services:
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
       - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
       - "--defaultentrypoints=http,https"
+      - "--backends.50x.servers.error.url=http://50x.redmic.s3-website-eu-west-1.amazonaws.com"
       - "--docker"
       - "--docker.swarmmode"
       - "--docker.domain=traefik"
