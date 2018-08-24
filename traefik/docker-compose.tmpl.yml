@@ -5,6 +5,11 @@ services:
     image: traefik:${IMAGE_TAG:-latest}
     command:
       - "--api"
+      - "--forwardingtimeouts.dialtimeout=15s"
+      - "--forwardingtimeouts.responseheadertimeout=15s"
+      - "--respondingtimeouts.idletimeout=30s"
+      - "--respondingtimeouts.readtimeout=1m"
+      - "--respondingtimeouts.writetimeout=1m"
       - "--docker"
       - "--docker.domain=traefik"
       - "--docker.watch"
