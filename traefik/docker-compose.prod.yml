@@ -3,7 +3,7 @@ version: '3.5'
 services:
   traefik:
     command:
-      - "--logLevel=DEBUG"
+      - "--logLevel=ERROR"
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
       - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
       - "--defaultentrypoints=http,https"
