@@ -2,8 +2,6 @@ version: '3.5'
 
 services:
   mail-mailserver:
-    container_name: mail-mailserver
-    restart: on-failure:3
     ports:
       - "25:25"
       - "143:143"
@@ -11,6 +9,27 @@ services:
       - "993:993"
       - "4190:4190"
       - "${RSPAMD_PORT}:${RSPAMD_PORT}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.port: "${RSPAMD_PORT}"
+        traefik.docker.network: traefik-net
+        traefik.frontend.rule: Host:spam.${PUBLIC_HOSTNAME}
+        traefik.backend: mailserver
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 1m
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          memory: 820M
 
 volumes:
   mail-mailserver-vol:

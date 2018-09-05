@@ -109,16 +109,16 @@ deploy-mail-server-dev:
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   script:
     - create-nets.sh mail-net
-    - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mail-mariadb IMAGE_TAG=10.2
+    - export DEPLOY_DIR_NAME=mail/mariadb STACK=mail SERVICES_TO_CHECK=mail_mail-mariadb IMAGE_TAG=10.2
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       MYSQL_PASSWORD=${DB_PASSWORD}
-    - export DEPLOY_DIR_NAME=mail/redis SERVICE=mail-redis IMAGE_TAG=4.0-alpine
+    - export DEPLOY_DIR_NAME=mail/redis STACK=mail SERVICES_TO_CHECK=mail_mail-redis IMAGE_TAG=4.0-alpine
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-    - export DEPLOY_DIR_NAME=mail/mailserver SERVICE=mail-mailserver IMAGE_TAG=1.1-latest
+    - export DEPLOY_DIR_NAME=mail/mailserver STACK=mail SERVICES_TO_CHECK=mail_mail-mailserver IMAGE_TAG=1.1-latest
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} RSPAMD_PASSWORD=${RSPAMD_PASSWORD}
-      DBPASS=${DB_PASSWORD}
+      DBPASS=${DB_PASSWORD} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
   environment:
     name: dev/rspamd
     url: https://spam.${DEV_PUBLIC_HOSTNAME}
@@ -131,11 +131,14 @@ deploy-mail-admin-dev:
   variables:
     DEPLOY_DIR_NAME: mail/postfixadmin
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: mail-postfixadmin
+    STACK: mail
+    SERVICES_TO_CHECK: mail_mail-postfixadmin
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
+      PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
   environment:
     name: dev/postfixadmin
     url: https://postfixadmin.${DEV_PUBLIC_HOSTNAME}
@@ -148,11 +151,12 @@ deploy-mail-client-dev:
   variables:
     DEPLOY_DIR_NAME: mail/rainloop
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: mail-rainloop
+    STACK: mail
+    SERVICES_TO_CHECK: mail_mail-rainloop
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
   environment:
     name: dev/rainloop
     url: https://webmail.${DEV_PUBLIC_HOSTNAME}
