@@ -1,13 +1,28 @@
 version: '3.5'
 
 services:
-  portainer:
-    image: portainer/portainer:${IMAGE_TAG:-latest}
+  agent:
+    image: portainer/agent
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.{{.Service.Name}}
+      AGENT_PORT: 9001
+      LOG_LEVEL: error
     networks:
       - redmic-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  portainer:
+    image: portainer/portainer:${IMAGE_TAG:-latest}
+    command: -H tcp://tasks.portainer_agent:9001 --tlsskipverify
+    networks:
+      - redmic-net
+      - traefik-net
     volumes:
       - portainer-vol:/data
 
 networks:
   redmic-net:
+    external: true
+  traefik-net:
     external: true

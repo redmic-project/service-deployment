@@ -5,6 +5,7 @@ services:
     image: hardware/rainloop:${IMAGE_TAG:-latest}
     networks:
       - mail-net
+      - traefik-net
     volumes:
       - mail-rainloop-vol:/rainloop/data
     environment:
@@ -12,4 +13,6 @@ services:
 
 networks:
   mail-net:
+    external: true
+  traefik-net:
     external: true

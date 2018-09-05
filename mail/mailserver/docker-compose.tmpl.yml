@@ -7,6 +7,7 @@ services:
     hostname: ${HOST_NAME}
     networks:
       - mail-net
+      - traefik-net
     volumes:
       - mail-mailserver-vol:/var/mail
     environment:
@@ -18,4 +19,6 @@ services:
 
 networks:
   mail-net:
+    external: true
+  traefik-net:
     external: true

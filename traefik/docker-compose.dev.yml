@@ -3,19 +3,14 @@ version: '3.5'
 services:
   traefik:
     command:
-      - "--logLevel=ERROR"
+      - "--logLevel=INFO"
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS:/ssl/certFile.cert,/ssl/keyFile.key"
+      - "--entrypoints=Name:https Address::443"
       - "--defaultentrypoints=http,https"
       - "--docker.swarmmode"
-    ports:
-      - 80:80
-      - 443:443
-    secrets:
-      - source: certFile-secret
-        target: /ssl/certFile.cert
-      - source: keyFile-secret
-        target: /ssl/keyFile.key
+#    ports:
+#      - 80:80
+#      - 443:443
     deploy:
       mode: replicated
       replicas: 1
@@ -38,9 +33,3 @@ services:
           memory: 128M
         reservations:
           memory: 103M
-
-secrets:
-  certFile-secret:
-    file: ./certFile.cert
-  keyFile-secret:
-    file: ./keyFile.key

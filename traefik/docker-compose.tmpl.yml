@@ -15,9 +15,12 @@ services:
       - "--docker.watch"
     networks:
       - redmic-net
+      - traefik-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   redmic-net:
+    external: true
+  traefik-net:
     external: true

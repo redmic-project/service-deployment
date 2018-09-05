@@ -2,5 +2,16 @@ version: '3.5'
 
 services:
   gitlab-runner-remote:
-    container_name: gitlab-runner-remote
-    restart: on-failure:3
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        window: 1m
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          memory: 820M

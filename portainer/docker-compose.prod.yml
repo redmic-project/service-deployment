@@ -2,21 +2,20 @@ version: '3.5'
 
 services:
   agent:
-    image: portainer/agent
-    networks:
-      - redmic-net
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      AGENT_CLUSTER_ADDR: tasks.{{.Service.Name}}
-      AGENT_PORT: 9001
-      LOG_LEVEL: error
     deploy:
       mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 1m
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 410M
+
   portainer:
-    command: -H tcp://tasks.portainer_agent:9001 --tlsskipverify
-    networks:
-      - traefik-net
     deploy:
       mode: replicated
       replicas: 1
@@ -30,11 +29,14 @@ services:
           - node.role == manager
       restart_policy:
         condition: on-failure
-        max_attempts: 3
-
-networks:
-  traefik-net:
-    external: true
+        delay: 30s
+        window: 2m
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 410M
 
 volumes:
   portainer-vol:

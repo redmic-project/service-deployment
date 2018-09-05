@@ -2,8 +2,22 @@ version: '3.5'
 
 services:
   mail-mariadb:
-    container_name: mail-mariadb
-    restart: on-failure:3
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 1m
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          memory: 103M
 
 volumes:
   mail-mariadb-vol:
