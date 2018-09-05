@@ -2,15 +2,6 @@ version: '3.5'
 
 services:
   gitlab-ce:
-    container_name: gitlab-ce
-    hostname: ${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}
-    restart: on-failure:3
-    ports:
-      - "${GITLAB_SSH_PORT}:22"
-      - "${GITLAB_HTTP_PORT}:80"
-      - "${GITLAB_HTTPS_PORT}:443"
-    volumes:
-      - /home/git/.ssh/authorized_keys_proxy:/gitlab-data/ssh/authorized_keys
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url '${GITLAB_PROTOCOL}://${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}'
@@ -35,6 +26,30 @@ services:
         gitlab_rails['smtp_authentication'] = "plain"
         gitlab_rails['smtp_enable_starttls_auto'] = true
         unicorn['port'] = 8090
+    ports:
+      - "${GITLAB_SSH_PORT}:22"
+      - "${GITLAB_HTTP_PORT}:80"
+      - "${GITLAB_HTTPS_PORT}:443"
+    volumes:
+      - /home/git/.ssh/authorized_keys_proxy:/gitlab-data/ssh/authorized_keys
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.port: "443"
+        traefik.docker.network: traefik-net
+        traefik.frontend.rule: Host:git.${PUBLIC_HOSTNAME}
+        traefik.backend: gitlab
+      restart_policy:
+        condition: on-failure
+        delay: 2m
+        window: 5m
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          memory: 3G
 
 volumes:
   gitlab-ce-config-vol:

@@ -3,8 +3,10 @@ version: '3.5'
 services:
   gitlab-ce:
     image: gitlab/gitlab-ce:${IMAGE_TAG:-latest}
+    hostname: ${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}
     networks:
       - gitlab-net
+      - traefik-net
     volumes:
       - gitlab-ce-config-vol:/etc/gitlab
       - gitlab-ce-log-vol:/var/log/gitlab
@@ -12,4 +14,6 @@ services:
 
 networks:
   gitlab-net:
+    external: true
+  traefik-net:
     external: true

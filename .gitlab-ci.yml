@@ -33,7 +33,8 @@ deploy-gitlab-ce-dev:
   variables:
     DEPLOY_DIR_NAME: gitlab-ce
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: gitlab-ce
+    STACK: gitlab
+    SERVICES_TO_CHECK: gitlab_gitlab-ce
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
     AWS_REGION: ${OAGDEV_GITLAB_AWS_REGION}
@@ -48,9 +49,9 @@ deploy-gitlab-ce-dev:
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} AWS_REGION=${AWS_REGION}
       AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} SMTP_ADDR=${SMTP_ADDR}
-      SMTP_USER=${SMTP_USER} SMTP_PASS=${SMTP_PASS} SMTP_DOMAIN=${SMTP_DOMAIN}
+      SMTP_USER=${SMTP_USER} SMTP_PASS=${SMTP_PASS} SMTP_DOMAIN=${SMTP_DOMAIN} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
   environment:
-    name: dev/${SERVICE}
+    name: dev/gitlab-ce
     url: https://git.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev
@@ -61,7 +62,8 @@ deploy-gitlab-runner-local:
   variables:
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: gitlab-runner-local
+    STACK: gitlab
+    SERVICES_TO_CHECK: gitlab_gitlab-runner-local
     IMAGE_TAG: alpine
     COMPOSE_FILE: docker-compose.gitlab-runner-local.tmpl.yml:docker-compose.gitlab-runner-local.dev.yml
     GITLAB_URL: https://git.redmic.net
@@ -74,7 +76,7 @@ deploy-gitlab-runner-local:
       GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       RUNNER_NAME="${RUNNER_NAME}"
   environment:
-    name: dev/${SERVICE}
+    name: dev/gitlab-runner-local
   only:
     - dev
   when: manual
@@ -84,7 +86,8 @@ deploy-gitlab-runner-remote:
   variables:
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: gitlab-runner-remote
+    STACK: gitlab
+    SERVICES_TO_CHECK: gitlab_gitlab-runner-remote
     IMAGE_TAG: alpine
     COMPOSE_FILE: docker-compose.gitlab-runner-remote.tmpl.yml:docker-compose.gitlab-runner-remote.dev.yml
     GITLAB_URL: https://gitlab.com
@@ -98,7 +101,7 @@ deploy-gitlab-runner-remote:
       GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       RUNNER_NAME="${RUNNER_NAME}" RUNNER_TAG_LIST=${RUNNER_TAG_LIST}
   environment:
-    name: dev/${SERVICE}
+    name: dev/gitlab-runner-remote
   only:
     - dev
   when: manual
