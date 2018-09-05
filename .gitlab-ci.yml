@@ -8,6 +8,7 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay2
+  STATUS_CHECK_DELAY: 120
 
 deploy-artifactory-dev:
   stage: deploy
