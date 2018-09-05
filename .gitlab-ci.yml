@@ -108,46 +108,6 @@ deploy-gitlab-runner-remote:
     - dev
   when: manual
 
-deploy-grafana-dev:
-  stage: deploy
-  variables:
-    DOCKER_DRIVER: overlay2
-    DEPLOY_DIR_NAME: grafana
-    SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: grafana
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
-  script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-  environment:
-    name: dev/${SERVICE}
-    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
-  only:
-    - dev
-  when: manual
-
-deploy-grafana-pro:
-  stage: deploy
-  variables:
-    DOCKER_DRIVER: overlay2
-    DEPLOY_DIR_NAME: grafana
-    SSH_REMOTE: ${PRO_SSH_REMOTE}
-    SERVICE: grafana
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
-  services:
-    - docker:dind
-  script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
-  environment:
-    name: pro/${SERVICE}
-    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
-  only:
-    - master
-  when: manual
-
 deploy-mail-server-dev:
   stage: deploy
   variables:
@@ -300,45 +260,28 @@ deploy-portainer-pro:
     - master
   when: manual
 
-deploy-prometheus-dev:
+deploy-traefik-dev:
   stage: deploy
   variables:
     DOCKER_DRIVER: overlay2
-    DEPLOY_DIR_NAME: prometheus
+    DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: prometheus
+    STACK: traefik
+    SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
   services:
     - docker:dind
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+    - create-nets.sh redmic-net traefik-net
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
+      UI_AUTH=${UI_AUTH}
   environment:
-    name: dev/${SERVICE}
-    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+    name: dev/traefik
+    url: https://traefik.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev
-  when: manual
-
-deploy-prometheus-pro:
-  stage: deploy
-  variables:
-    DOCKER_DRIVER: overlay2
-    DEPLOY_DIR_NAME: prometheus
-    SSH_REMOTE: ${PRO_SSH_REMOTE}
-    STACK: prometheus
-    SERVICES_TO_CHECK: prometheus_prometheus
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
-  services:
-    - docker:dind
-  script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
-  environment:
-    name: pro/${SERVICE}
-    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
-  only:
-    - master
   when: manual
 
 deploy-traefik-pro:
@@ -361,8 +304,8 @@ deploy-traefik-pro:
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
       UI_AUTH=${UI_AUTH}
   environment:
-    name: pro/${SERVICE}
-    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+    name: pro/traefik
+    url: https://traefik.${PRO_PUBLIC_HOSTNAME}
   only:
     - master
   when: manual
