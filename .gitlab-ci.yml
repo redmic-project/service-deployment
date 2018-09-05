@@ -3,17 +3,20 @@ stages:
 
 image: registry.gitlab.com/redmic-project/docker/docker-deploy
 
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+
 deploy-artifactory-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: artifactory
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: artifactory
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
@@ -27,7 +30,6 @@ deploy-artifactory-dev:
 deploy-gitlab-ce-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: gitlab-ce
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: gitlab-ce
@@ -40,8 +42,6 @@ deploy-gitlab-ce-dev:
     SMTP_USER: ${OAGDEV_GITLAB_SMTP_USER}
     SMTP_PASS: ${OAGDEV_GITLAB_SMTP_PASS}
     SMTP_DOMAIN: ${OAGDEV_GITLAB_SMTP_DOMAIN}
-  services:
-    - docker:dind
   script:
     - create-nets.sh gitlab-net
     - >
@@ -58,7 +58,6 @@ deploy-gitlab-ce-dev:
 deploy-gitlab-runner-local:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: gitlab-runner-local
@@ -67,8 +66,6 @@ deploy-gitlab-runner-local:
     GITLAB_URL: https://git.redmic.net
     GITLAB_TOKEN: ${OAGDEV_GITLAB_TOKEN}
     RUNNER_NAME: OAGDev runner
-  services:
-    - docker:dind
   script:
     - create-nets.sh gitlab-net
     - >
@@ -84,7 +81,6 @@ deploy-gitlab-runner-local:
 deploy-gitlab-runner-remote:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: gitlab-runner
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: gitlab-runner-remote
@@ -94,8 +90,6 @@ deploy-gitlab-runner-remote:
     GITLAB_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
     RUNNER_NAME: GitLab.com runner
     RUNNER_TAG_LIST: client,functional,oagdev
-  services:
-    - docker:dind
   script:
     - create-nets.sh gitlab-net
     - >
@@ -111,11 +105,8 @@ deploy-gitlab-runner-remote:
 deploy-mail-server-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - create-nets.sh mail-net
     - export DEPLOY_DIR_NAME=mail/mariadb SERVICE=mail-mariadb IMAGE_TAG=10.2
@@ -138,14 +129,11 @@ deploy-mail-server-dev:
 deploy-mail-admin-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: mail/postfixadmin
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: mail-postfixadmin
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} DBPASS=${DB_PASSWORD}
   environment:
@@ -158,14 +146,11 @@ deploy-mail-admin-dev:
 deploy-mail-client-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: mail/rainloop
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: mail-rainloop
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
   environment:
@@ -178,14 +163,11 @@ deploy-mail-client-dev:
 deploy-minio-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: minio
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: minio
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
@@ -200,14 +182,11 @@ deploy-minio-dev:
 deploy-pgadmin-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: pgadmin
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     SERVICE: pgadmin
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PGADMIN_SETUP_EMAIL=${PGADMIN_SETUP_EMAIL}
@@ -222,19 +201,17 @@ deploy-pgadmin-dev:
 deploy-portainer-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: portainer
     SSH_REMOTE: ${DEV_SSH_REMOTE}
-    SERVICE: portainer
+    STACK: portainer
+    SERVICES_TO_CHECK: portainer_agent portainer_portainer
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
   environment:
-    name: dev/${SERVICE}
-    url: https://${SERVICE}.${DEV_PUBLIC_HOSTNAME}
+    name: dev/portainer
+    url: https://portainer.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev
   when: manual
@@ -242,20 +219,17 @@ deploy-portainer-dev:
 deploy-portainer-pro:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: portainer
     SSH_REMOTE: ${PRO_SSH_REMOTE}
     STACK: portainer
     SERVICES_TO_CHECK: portainer_agent portainer_portainer
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
-  services:
-    - docker:dind
   script:
     - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
   environment:
-    name: pro/${SERVICE}
-    url: https://${SERVICE}.${PRO_PUBLIC_HOSTNAME}
+    name: pro/portainer
+    url: https://portainer.${PRO_PUBLIC_HOSTNAME}
   only:
     - master
   when: manual
@@ -263,15 +237,12 @@ deploy-portainer-pro:
 deploy-traefik-dev:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${DEV_SSH_REMOTE}
     STACK: traefik
     SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  services:
-    - docker:dind
   script:
     - create-nets.sh redmic-net traefik-net
     - >
@@ -287,15 +258,12 @@ deploy-traefik-dev:
 deploy-traefik-pro:
   stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
     DEPLOY_DIR_NAME: traefik
     SSH_REMOTE: ${PRO_SSH_REMOTE}
     STACK: traefik
     SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
-  services:
-    - docker:dind
   script:
     - echo "${CERT_FILE}" > "${DEPLOY_DIR_NAME}/certFile.cert"
     - echo "${KEY_FILE}" > "${DEPLOY_DIR_NAME}/keyFile.key"
