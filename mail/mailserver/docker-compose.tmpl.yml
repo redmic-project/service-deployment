@@ -3,7 +3,6 @@ version: '3.5'
 services:
   mail-mailserver:
     image: hardware/mailserver:${IMAGE_TAG:-latest}
-    domainname: ${DOMAIN_NAME}
     hostname: ${HOST_NAME}
     networks:
       - mail-net
@@ -11,7 +10,7 @@ services:
     volumes:
       - mail-mailserver-vol:/var/mail
     environment:
-      - DOMAIN=${DOMAIN_NAME}
+      - DOMAIN
       - REDIS_HOST
       - DBHOST
       - DBPASS
