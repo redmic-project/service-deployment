@@ -3,7 +3,9 @@ version: '3.5'
 services:
   mail-rainloop:
     ports:
-      - "${RAINLOOP_PORT}:8888"
+      - target: 8888
+        published: ${RAINLOOP_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1

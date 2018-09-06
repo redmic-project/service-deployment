@@ -3,7 +3,9 @@ version: '3.5'
 services:
   minio:
     ports:
-      - ${MINIO_PORT}:9000
+      - target: 9000
+        published: ${MINIO_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1

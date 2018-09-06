@@ -12,7 +12,9 @@ services:
       - gitlab-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config-remote:/etc/gitlab-runner
+    configs:
+      - source: config-remote
+        target: /etc/gitlab-runner/config.toml
     environment:
       - CI_SERVER_URL=${GITLAB_URL}
       - REGISTRATION_TOKEN=${GITLAB_TOKEN}
@@ -43,3 +45,7 @@ services:
 networks:
   gitlab-net:
     external: true
+
+configs:
+  config-remote:
+    file: ./config-remote/config.toml

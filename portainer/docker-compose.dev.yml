@@ -17,7 +17,9 @@ services:
 
   portainer:
     ports:
-      - 6020:9000
+      - target: 9000
+        published: 6020
+        mode: host
     deploy:
       mode: replicated
       replicas: 1
