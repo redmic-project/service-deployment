@@ -3,7 +3,9 @@ version: '3.5'
 services:
   mail-postfixadmin:
     ports:
-      - "${POSTFIXADMIN_PORT}:8888"
+      - target: 8888
+        published: ${POSTFIXADMIN_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1

@@ -3,12 +3,24 @@ version: '3.5'
 services:
   mail-mailserver:
     ports:
-      - "25:25"
-      - "143:143"
-      - "587:587"
-      - "993:993"
-      - "4190:4190"
-      - "${RSPAMD_PORT}:${RSPAMD_PORT}"
+      - target: 25
+        published: 25
+        mode: host
+      - target: 143
+        published: 143
+        mode: host
+      - target: 587
+        published: 587
+        mode: host
+      - target: 993
+        published: 993
+        mode: host
+      - target: 4190
+        published: 4190
+        mode: host
+      - target: ${RSPAMD_PORT}
+        published: ${RSPAMD_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1

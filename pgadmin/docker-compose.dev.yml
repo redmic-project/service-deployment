@@ -3,7 +3,9 @@ version: '3.5'
 services:
   pgadmin:
     ports:
-      - ${PGADMIN_PORT}:${PGADMIN_PORT}
+      - target: ${PGADMIN_PORT}
+        published: ${PGADMIN_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1

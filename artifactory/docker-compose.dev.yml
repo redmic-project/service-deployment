@@ -3,7 +3,9 @@ version: '3.5'
 services:
   artifactory:
     ports:
-      - ${ARTIFACTORY_PORT}:8081
+      - target: 8081
+        published: ${ARTIFACTORY_PORT}
+        mode: host
     deploy:
       mode: replicated
       replicas: 1
