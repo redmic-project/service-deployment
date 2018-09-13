@@ -5,7 +5,6 @@ services:
     deploy:
       mode: global
       restart_policy:
-        condition: on-failure
         delay: 10s
         window: 1m
       resources:
@@ -29,7 +28,6 @@ services:
         traefik.frontend.rule: Host:portainer.${PUBLIC_HOSTNAME}
         traefik.backend: portainer
       restart_policy:
-        condition: on-failure
         delay: 30s
         window: 2m
       resources:
