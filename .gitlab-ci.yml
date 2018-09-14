@@ -256,6 +256,7 @@ deploy-traefik-dev:
     SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    UI_AUTH: ${DEV_UI_AUTH}
   script:
     - create-nets.sh redmic-net traefik-net
     - >
@@ -277,6 +278,7 @@ deploy-traefik-pro:
     SERVICES_TO_CHECK: traefik_traefik
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
+    UI_AUTH: ${PRO_UI_AUTH}
   script:
     - echo "${CERT_FILE}" > "${DEPLOY_DIR_NAME}/certFile.cert"
     - echo "${KEY_FILE}" > "${DEPLOY_DIR_NAME}/keyFile.key"
