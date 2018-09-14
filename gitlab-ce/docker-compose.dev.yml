@@ -47,7 +47,6 @@ services:
         traefik.frontend.rule: Host:git.${PUBLIC_HOSTNAME}
         traefik.backend: gitlab
       restart_policy:
-        condition: on-failure
         delay: 2m
         window: 5m
       resources:
