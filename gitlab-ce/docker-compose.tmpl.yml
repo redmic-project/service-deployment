@@ -7,9 +7,8 @@ services:
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url '${GITLAB_PROTOCOL}://${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}'
-        registry_external_url 'https://${GITLAB_REGISTRY_SUBDOMAIN}.${GITLAB_DOMAIN}'
+        registry_external_url 'http://${GITLAB_REGISTRY_SUBDOMAIN}.${GITLAB_DOMAIN}'
         gitlab_rails['registry_enabled'] = true
-        web_server['external_users'] = ['www-data']
         gitlab_rails['backup_keep_time'] = 604800
         gitlab_rails['backup_upload_connection'] = {
            'provider' => 'AWS',
