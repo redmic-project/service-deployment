@@ -37,6 +37,7 @@ deploy-gitlab-ce-dev:
     STACK: gitlab
     SERVICES_TO_CHECK: gitlab_gitlab-ce
     STATUS_CHECK_DELAY: 300
+    AUTHORIZED_KEYS_PROXY: ${GITLAB_AUTHORIZED_KEYS_PROXY}
     IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
     AWS_REGION: ${OAGDEV_GITLAB_AWS_REGION}
@@ -47,6 +48,7 @@ deploy-gitlab-ce-dev:
     SMTP_PASS: ${OAGDEV_GITLAB_SMTP_PASS}
     SMTP_DOMAIN: ${OAGDEV_GITLAB_SMTP_DOMAIN}
   script:
+    - echo "${AUTHORIZED_KEYS_PROXY}" > "${DEPLOY_DIR_NAME}/authorized_keys_proxy"
     - create-nets.sh gitlab-net
     - >
       deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} AWS_REGION=${AWS_REGION}

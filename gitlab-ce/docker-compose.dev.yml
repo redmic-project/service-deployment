@@ -12,6 +12,9 @@ services:
       - target: 443
         published: ${GITLAB_HTTPS_PORT}
         mode: host
+    secrets:
+      - source: authorized_keys_proxy
+        target: /gitlab-data/ssh/authorized_keys
     deploy:
       mode: replicated
       replicas: 1
@@ -41,5 +44,5 @@ volumes:
     name: gitlab-ce-data-vol
 
 secrets:
-  ssh-public-keys:
-    file: /home/git/.ssh/authorized_keys_proxy
+  authorized_keys_proxy:
+    file: ./authorized_keys_proxy

@@ -34,9 +34,6 @@ services:
       - gitlab-ce-config-vol:/etc/gitlab
       - gitlab-ce-log-vol:/var/log/gitlab
       - gitlab-ce-data-vol:/var/opt/gitlab
-    secrets:
-      - source: ssh-public-keys
-        target: /gitlab-data/ssh/authorized_keys
 
 networks:
   gitlab-net:
