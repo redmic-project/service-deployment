@@ -14,3 +14,10 @@ services:
           memory: 1G
         reservations:
           memory: 820M
+
+volumes:
+  etc-vol:
+    name: gitlab-runner-local-etc-vol
+
+  home-vol:
+    name: gitlab-runner-local-home-vol

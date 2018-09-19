@@ -8,13 +8,6 @@ services:
       -c "
         gitlab-runner register ;
         gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner"
-    networks:
-      - gitlab-net
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    configs:
-      - source: config-local
-        target: /etc/gitlab-runner/config.toml
     environment:
       - CI_SERVER_URL=${GITLAB_URL}
       - REGISTRATION_TOKEN=${GITLAB_TOKEN}
@@ -41,11 +34,20 @@ services:
       - S3_SECRET_KEY=${MINIO_SECRET_KEY}
       - S3_BUCKET_NAME=${RUNNER_S3_BUCKET_NAME}
       - S3_CACHE_INSECURE=${RUNNER_S3_CACHE_INSECURE}
+    networks:
+      - gitlab-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - etc-vol:/etc/gitlab-runner
+      - home-vol:/home/gitlab-runner
+    configs:
+      - source: config-toml
+        target: /etc/gitlab-runner/config.toml
 
 networks:
   gitlab-net:
     external: true
 
 configs:
-  config-local:
+  config-toml:
     file: ./config-local/config.toml
