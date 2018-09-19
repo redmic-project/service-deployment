@@ -26,7 +26,6 @@ services:
         gitlab_rails['smtp_authentication'] = "plain"
         gitlab_rails['smtp_enable_starttls_auto'] = true
         gitlab_rails['smtp_tls'] = false
-        unicorn['port'] = '${GITLAB_UNICORN_PORT}'
     networks:
       - gitlab-net
       - traefik-net

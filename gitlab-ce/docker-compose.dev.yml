@@ -9,9 +9,6 @@ services:
       - target: 80
         published: ${GITLAB_HTTP_PORT}
         mode: host
-      - target: ${GITLAB_UNICORN_PORT}
-        published: ${GITLAB_UNICORN_PORT}
-        mode: host
     secrets:
       - source: authorized_keys_proxy
         target: /gitlab-data/ssh/authorized_keys
