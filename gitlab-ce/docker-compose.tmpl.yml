@@ -4,6 +4,28 @@ services:
   gitlab-ce:
     image: gitlab/gitlab-ce:${IMAGE_TAG:-latest}
     hostname: ${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://${GITLAB_SUBDOMAIN}.${GITLAB_DOMAIN}'
+        registry_external_url 'http://${GITLAB_REGISTRY_SUBDOMAIN}.${GITLAB_DOMAIN}'
+        gitlab_rails['registry_enabled'] = true
+        gitlab_rails['backup_keep_time'] = 604800
+        gitlab_rails['backup_upload_connection'] = {
+           'provider' => 'AWS',
+           'region' => "${AWS_REGION}",
+           'aws_access_key_id' => "${AWS_ACCESS_KEY_ID}",
+           'aws_secret_access_key' => "${AWS_SECRET_ACCESS_KEY}"
+        }
+        gitlab_rails['backup_upload_remote_directory'] = 'gitlab.bkp'
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "${SMTP_ADDR}"
+        gitlab_rails['smtp_port'] = 25
+        gitlab_rails['smtp_user_name'] = "${SMTP_USER}"
+        gitlab_rails['smtp_password'] = "${SMTP_PASS}"
+        gitlab_rails['smtp_domain'] = "${SMTP_DOMAIN}"
+        gitlab_rails['smtp_authentication'] = "plain"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = false
     networks:
       - gitlab-net
       - traefik-net
@@ -15,5 +37,6 @@ services:
 networks:
   gitlab-net:
     external: true
+
   traefik-net:
     external: true

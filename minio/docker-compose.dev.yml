@@ -25,5 +25,8 @@ services:
           memory: 410M
 
 volumes:
-  minio-vol:
-    name: minio-vol
+  data-vol:
+    name: minio-data-vol
+
+  export-vol:
+    name: minio-export-vol
