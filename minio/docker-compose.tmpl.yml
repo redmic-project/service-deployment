@@ -8,14 +8,14 @@ services:
       - MINIO_ACCESS_KEY
       - MINIO_SECRET_KEY
     networks:
-      - redmic-net
+      - gitlab-net
       - traefik-net
     volumes:
       - export-vol:/export
       - data-vol:/data
 
 networks:
-  redmic-net:
+  gitlab-net:
     external: true
 
   traefik-net:
