@@ -44,6 +44,9 @@ services:
     configs:
       - source: config-toml
         target: ${CONFIG_FILE}
+        uid: '100'
+        gid: '0'
+        mode: 0660
 
 networks:
   gitlab-net:
