@@ -20,14 +20,6 @@ services:
       - RUNNER_REQUEST_CONCURRENCY
       - RUNNER_OUTPUT_LIMIT
       - RUNNER_EXECUTOR
-      - DOCKER_IMAGE
-      - DOCKER_TLS_VERIFY
-      - DOCKER_PRIVILEGED
-      - DOCKER_DISABLE_CACHE
-      - DOCKER_SHM_SIZE
-      - DOCKER_MEMORY
-      - DOCKER_MEMORY_RESERVATION
-      - DOCKER_CPUS
       - CACHE_TYPE
       - CACHE_SHARED
       - CACHE_S3_SERVER_ADDRESS
@@ -35,20 +27,21 @@ services:
       - CACHE_S3_SECRET_KEY
       - CACHE_S3_BUCKET_NAME
       - CACHE_S3_INSECURE
+      - DOCKER_IMAGE=${RUNNER_DOCKER_IMAGE}
+      - DOCKER_TLS_VERIFY=${RUNNER_DOCKER_TLS_VERIFY}
+      - DOCKER_PRIVILEGED=${RUNNER_DOCKER_PRIVILEGED}
+      - DOCKER_DISABLE_CACHE=${RUNNER_DOCKER_DISABLE_CACHE}
+      - DOCKER_SHM_SIZE=${RUNNER_DOCKER_SHM_SIZE}
+      - DOCKER_MEMORY=${RUNNER_DOCKER_MEMORY}
+      - DOCKER_MEMORY_RESERVATION=${RUNNER_DOCKER_MEMORY_RESERVATION}
+      - DOCKER_CPUS=${RUNNER_DOCKER_CPUS}
     networks:
       - gitlab-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - etc-vol:/etc/gitlab-runner
       - home-vol:/home/gitlab-runner
-    configs:
-      - source: config-toml
-        target: ${CONFIG_FILE}
 
 networks:
   gitlab-net:
     external: true
-
-configs:
-  config-toml:
-    file: ./config-local/config.toml
