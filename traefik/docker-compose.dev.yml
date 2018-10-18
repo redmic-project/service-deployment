@@ -4,16 +4,9 @@ services:
   traefik:
     command:
       - "--logLevel=INFO"
-      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS"
-      - "--defaultentrypoints=http,https"
+      - "--entrypoints=Name:http Address::80"
+      - "--defaultentrypoints=http"
       - "--docker.swarmmode"
-      - "--acme"
-      - "--acme.onhostrule"
-      - "--acme.email=info@redmic.es"
-      - "--acme.storage=acme.json"
-      - "--acme.entrypoint=https"
-      - "--acme.httpchallenge.entrypoint=http"
     deploy:
       mode: replicated
       replicas: 1
