@@ -8,6 +8,12 @@ services:
       - "--entrypoints=Name:https Address::443"
       - "--defaultentrypoints=http,https"
       - "--docker.swarmmode"
+      - "--acme"
+      - "--acme.onhostrule"
+      - "--acme.email=info@redmic.es"
+      - "--acme.storage=acme.json"
+      - "--acme.entrypoint=https"
+      - "--acme.httpchallenge.entrypoint=http"
     ports:
       - target: 80
         published: 80
