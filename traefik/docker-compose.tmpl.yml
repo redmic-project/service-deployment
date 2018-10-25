@@ -13,6 +13,8 @@ services:
       - "--docker"
       - "--docker.domain=traefik"
       - "--docker.watch"
+      - "--metrics.prometheus.entrypoint=traefik"
+      - "--metrics.prometheus.buckets=[0.1,0.3,1.2,5.0]"
     networks:
       - redmic-net
       - traefik-net
