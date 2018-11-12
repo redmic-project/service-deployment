@@ -10,10 +10,10 @@ services:
         window: 1m
       resources:
         limits:
-          cpus: '1'
-          memory: 1G
+          cpus: '0.5'
+          memory: 128M
         reservations:
-          memory: 820M
+          memory: 103M
 
 volumes:
   etc-vol:

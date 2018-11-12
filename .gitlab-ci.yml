@@ -70,15 +70,20 @@ deploy-gitlab-runner-local:
     SERVICES_TO_CHECK: gitlab_gitlab-runner-local
     IMAGE_TAG: alpine
     COMPOSE_FILE: docker-compose.gitlab-runner-local.tmpl.yml:docker-compose.gitlab-runner-local.dev.yml
-    GITLAB_URL: https://git.redmic.net
-    GITLAB_TOKEN: ${OAGDEV_GITLAB_TOKEN}
-    RUNNER_NAME: OAGDev runner
+    CI_SERVER_URL: http://gitlab_gitlab-ce
+    REGISTRATION_TOKEN: ${OAGDEV_GITLAB_TOKEN}
+    RUNNER_NAME: OAGDev local
+    RUNNER_TAG_LIST: oagdev
+    CACHE_S3_SERVER_ADDRESS: minio.redmic.net
+    CACHE_S3_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+    CACHE_S3_SECRET_KEY: ${MINIO_SECRET_KEY}
   script:
     - create-nets.sh gitlab-net
     - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
-      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      RUNNER_NAME="${RUNNER_NAME}"
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} CI_SERVER_URL="${CI_SERVER_URL}"
+      REGISTRATION_TOKEN="${REGISTRATION_TOKEN}" RUNNER_NAME="${RUNNER_NAME}" RUNNER_TAG_LIST="${RUNNER_TAG_LIST}"
+      CACHE_S3_SERVER_ADDRESS="${CACHE_S3_SERVER_ADDRESS}" CACHE_S3_ACCESS_KEY="${MINIO_ACCESS_KEY}"
+      CACHE_S3_SECRET_KEY="${MINIO_SECRET_KEY}"
   environment:
     name: dev/gitlab-runner-local
   only:
@@ -94,16 +99,20 @@ deploy-gitlab-runner-remote:
     SERVICES_TO_CHECK: gitlab_gitlab-runner-remote
     IMAGE_TAG: alpine
     COMPOSE_FILE: docker-compose.gitlab-runner-remote.tmpl.yml:docker-compose.gitlab-runner-remote.dev.yml
-    GITLAB_URL: https://gitlab.com
-    GITLAB_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
-    RUNNER_NAME: GitLab.com runner
-    RUNNER_TAG_LIST: client,functional,oagdev
+    CI_SERVER_URL: https://gitlab.com
+    REGISTRATION_TOKEN: ${GITLABCOM_GITLAB_TOKEN}
+    RUNNER_NAME: OAGDev remote
+    RUNNER_TAG_LIST: oagdev
+    CACHE_S3_SERVER_ADDRESS: minio.redmic.net
+    CACHE_S3_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+    CACHE_S3_SECRET_KEY: ${MINIO_SECRET_KEY}
   script:
     - create-nets.sh gitlab-net
     - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} GITLAB_URL=${GITLAB_URL}
-      GITLAB_TOKEN=${GITLAB_TOKEN} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      RUNNER_NAME="${RUNNER_NAME}" RUNNER_TAG_LIST=${RUNNER_TAG_LIST}
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} CI_SERVER_URL="${CI_SERVER_URL}"
+      REGISTRATION_TOKEN="${REGISTRATION_TOKEN}" RUNNER_NAME="${RUNNER_NAME}" RUNNER_TAG_LIST="${RUNNER_TAG_LIST}"
+      CACHE_S3_SERVER_ADDRESS="${CACHE_S3_SERVER_ADDRESS}" CACHE_S3_ACCESS_KEY="${MINIO_ACCESS_KEY}"
+      CACHE_S3_SECRET_KEY="${MINIO_SECRET_KEY}"
   environment:
     name: dev/gitlab-runner-remote
   only:

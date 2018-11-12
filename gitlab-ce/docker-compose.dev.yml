@@ -6,9 +6,6 @@ services:
       - target: 22
         published: ${GITLAB_SSH_PORT}
         mode: host
-      - target: 80
-        published: ${GITLAB_HTTP_PORT}
-        mode: host
     secrets:
       - source: authorized_keys_proxy
         target: /gitlab-data/ssh/authorized_keys
@@ -18,7 +15,8 @@ services:
       labels:
         traefik.port: "80"
         traefik.docker.network: traefik-net
-        traefik.frontend.rule: Host:${GITLAB_REGISTRY_SUBDOMAIN}.${PUBLIC_HOSTNAME}
+        traefik.gitlab.frontend.rule: Host:${GITLAB_SUBDOMAIN}.${PUBLIC_HOSTNAME}
+        traefik.registry.frontend.rule: Host:${GITLAB_REGISTRY_SUBDOMAIN}.${PUBLIC_HOSTNAME}
         traefik.backend: gitlab
       restart_policy:
         delay: 2m
