@@ -10,9 +10,9 @@ services:
       - "--maxIdleConnsPerHost=1000"
       - "--forwardingtimeouts.dialtimeout=15s"
       - "--forwardingtimeouts.responseheadertimeout=0s"
-      - "--respondingtimeouts.idletimeout=180s"
-      - "--respondingtimeouts.readtimeout=1m"
-      - "--respondingtimeouts.writetimeout=1m"
+      - "--respondingtimeouts.idletimeout=3m"
+      - "--respondingtimeouts.readtimeout=2m"
+      - "--respondingtimeouts.writetimeout=0s"
       - "--docker"
       - "--docker.domain=traefik"
       - "--docker.watch"
@@ -31,10 +31,10 @@ services:
       mode: replicated
       replicas: 1
       labels:
-        traefik.port: "8080"
         traefik.docker.network: traefik-net
-        traefik.frontend.auth.basic: ${UI_AUTH}
+        traefik.frontend.auth.basic.users: ${UI_AUTH}
         traefik.frontend.rule: Host:traefik.${PUBLIC_HOSTNAME}
+        traefik.port: "8080"
         traefik.backend: traefik
       placement:
         constraints:
