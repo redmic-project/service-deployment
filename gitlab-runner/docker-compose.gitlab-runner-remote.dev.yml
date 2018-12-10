@@ -1,8 +1,0 @@
-version: '3.5'
-
-volumes:
-  etc-vol:
-    name: gitlab-runner-remote-etc-vol
-
-  home-vol:
-    name: gitlab-runner-remote-home-vol

@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  gitlab-runner-local:
+  gitlab-runner:
     image: gitlab/gitlab-runner:${IMAGE_TAG:-latest}
     entrypoint: /bin/sh
     command: >
@@ -30,7 +30,6 @@ services:
       - DOCKER_IMAGE=${RUNNER_DOCKER_IMAGE}
       - DOCKER_TLS_VERIFY=${RUNNER_DOCKER_TLS_VERIFY}
       - DOCKER_PRIVILEGED=${RUNNER_DOCKER_PRIVILEGED}
-      - DOCKER_NETWORK_MODE=${RUNNER_DOCKER_NETWORK_MODE}
       - DOCKER_DISABLE_CACHE=${RUNNER_DOCKER_DISABLE_CACHE}
       - DOCKER_SHM_SIZE=${RUNNER_DOCKER_SHM_SIZE}
       - DOCKER_MEMORY=${RUNNER_DOCKER_MEMORY}
@@ -42,6 +41,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - etc-vol:/etc/gitlab-runner
       - home-vol:/home/gitlab-runner
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        delay: 30s
+        window: 1m
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 32M
+        reservations:
+          memory: 16M
 
 networks:
   gitlab-net:
