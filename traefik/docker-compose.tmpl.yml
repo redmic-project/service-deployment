@@ -5,22 +5,23 @@ services:
     image: traefik:${IMAGE_TAG:-latest}
     command:
       - "--api"
+      - "--sendAnonymousUsage=true"
       - "--entrypoints=Name:http Address::80"
       - "--defaultentrypoints=http"
       - "--maxIdleConnsPerHost=1000"
       - "--forwardingtimeouts.dialtimeout=15s"
       - "--forwardingtimeouts.responseheadertimeout=0s"
       - "--respondingtimeouts.idletimeout=3m"
-      - "--respondingtimeouts.readtimeout=2m"
+      - "--respondingtimeouts.readtimeout=0s"
       - "--respondingtimeouts.writetimeout=0s"
       - "--docker"
-      - "--docker.domain=traefik"
       - "--docker.watch"
+      - "--docker.network=${TRAEFIK_NET_NAME}"
+      - "--docker.domain=${PUBLIC_HOSTNAME}"
       - "--docker.swarmmode"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
       - "--metrics.prometheus.entrypoint=traefik"
-      - "--sendAnonymousUsage=true"
     networks:
       - traefik-net
       - metric-net
@@ -31,11 +32,10 @@ services:
       mode: replicated
       replicas: 1
       labels:
-        traefik.docker.network: traefik-net
         traefik.frontend.auth.basic.users: ${UI_AUTH}
         traefik.frontend.rule: Host:traefik.${PUBLIC_HOSTNAME}
-        traefik.port: "8080"
         traefik.backend: traefik
+        traefik.port: '8080'
       placement:
         constraints:
           - node.role == manager
@@ -47,15 +47,18 @@ services:
           cpus: '2'
           memory: 128M
         reservations:
-          memory: 103M
+          memory: 64M
 
 networks:
   traefik-net:
-    external: true
+    name: ${TRAEFIK_NET_NAME}
+    driver: overlay
+    attachable: ${TRAEFIK_NET_ATTACHABLE:-true}
 
   metric-net:
+    name: ${METRIC_NET_NAME:-metric-net}
     external: true
 
 volumes:
   vol:
-    name: traefik-vol
+    name: ${TRAEFIK_VOL_NAME:-traefik-vol}
