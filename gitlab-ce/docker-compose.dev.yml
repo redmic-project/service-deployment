@@ -9,35 +9,18 @@ services:
     secrets:
       - source: authorized_keys_proxy
         target: /gitlab-data/ssh/authorized_keys
-    deploy:
-      mode: replicated
-      replicas: 1
-      labels:
-        traefik.port: "80"
-        traefik.docker.network: traefik-net
-        traefik.gitlab.frontend.rule: Host:${GITLAB_SUBDOMAIN}.${PUBLIC_HOSTNAME}
-        traefik.registry.frontend.rule: Host:${GITLAB_REGISTRY_SUBDOMAIN}.${PUBLIC_HOSTNAME}
-        traefik.backend: gitlab
-      restart_policy:
-        delay: 2m
-        window: 5m
-      resources:
-        limits:
-          cpus: '2'
-          memory: 4G
-        reservations:
-          memory: 3G
 
 volumes:
-  gitlab-ce-config-vol:
-    name: gitlab-ce-config-vol
+  config-vol:
+    name: ${CONFIG_VOL_NAME:-gitlab-ce-config-vol}
 
-  gitlab-ce-log-vol:
-    name: gitlab-ce-log-vol
+  log-vol:
+    name: ${LOG_VOL_NAME:-gitlab-ce-log-vol}
 
-  gitlab-ce-data-vol:
-    name: gitlab-ce-data-vol
+  data-vol:
+    name: ${DATA_VOL_NAME:-gitlab-ce-data-vol}
 
 secrets:
   authorized_keys_proxy:
+    name: ${AUTHORIZED_KEYS_PROXY_NAME:-gitlab-authorized-keys-proxy}
     file: ./authorized_keys_proxy

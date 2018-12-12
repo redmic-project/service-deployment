@@ -35,8 +35,6 @@ services:
       - DOCKER_MEMORY=${RUNNER_DOCKER_MEMORY}
       - DOCKER_MEMORY_RESERVATION=${RUNNER_DOCKER_MEMORY_RESERVATION}
       - DOCKER_CPUS=${RUNNER_DOCKER_CPUS}
-    networks:
-      - gitlab-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - etc-vol:/etc/gitlab-runner
@@ -53,7 +51,3 @@ services:
           memory: 32M
         reservations:
           memory: 16M
-
-networks:
-  gitlab-net:
-    external: true
