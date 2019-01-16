@@ -27,16 +27,30 @@ services:
         gitlab_rails['smtp_enable_starttls_auto'] = true
         gitlab_rails['smtp_tls'] = false
     networks:
-      - gitlab-net
       - traefik-net
     volumes:
-      - gitlab-ce-config-vol:/etc/gitlab
-      - gitlab-ce-log-vol:/var/log/gitlab
-      - gitlab-ce-data-vol:/var/opt/gitlab
+      - config-vol:/etc/gitlab
+      - log-vol:/var/log/gitlab
+      - data-vol:/var/opt/gitlab
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.gitlab.frontend.rule: Host:${GITLAB_SUBDOMAIN}.${PUBLIC_HOSTNAME}
+        traefik.registry.frontend.rule: Host:${GITLAB_REGISTRY_SUBDOMAIN}.${PUBLIC_HOSTNAME}
+        traefik.backend: gitlab-ce
+        traefik.port: '80'
+      restart_policy:
+        delay: 1m
+        window: 5m
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          memory: 2G
 
 networks:
-  gitlab-net:
-    external: true
-
   traefik-net:
+    name: ${TRAEFIK_NET_NAME:-traefik-net}
     external: true
