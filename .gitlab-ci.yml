@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-image: registry.gitlab.com/redmic-project/docker/docker-deploy
+image: registry.gitlab.com/redmic-project/docker/docker-deploy:${DOCKER_DEPLOY_IMAGE_TAG}
 
 services:
   - docker:dind
@@ -206,9 +206,13 @@ deploy-portainer-dev:
     STACK: portainer
     SERVICES_TO_CHECK: portainer_agent portainer_portainer
     IMAGE_TAG: latest
+    AGENT_IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
+    AGENT_DOCKER_VOLUMES_PATH: ${DEV_AGENT_DOCKER_VOLUMES_PATH}
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+      PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME} AGENT_DOCKER_VOLUMES_PATH=${AGENT_DOCKER_VOLUMES_PATH}
   environment:
     name: dev/portainer
     url: https://portainer.${DEV_PUBLIC_HOSTNAME}
@@ -224,9 +228,13 @@ deploy-portainer-pro:
     STACK: portainer
     SERVICES_TO_CHECK: portainer_agent portainer_portainer
     IMAGE_TAG: latest
+    AGENT_IMAGE_TAG: latest
     COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.prod.yml
+    AGENT_DOCKER_VOLUMES_PATH: ${PRO_AGENT_DOCKER_VOLUMES_PATH}
   script:
-    - deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME}
+    - >
+      deploy.sh IMAGE_TAG=${IMAGE_TAG} AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
+      PUBLIC_HOSTNAME=${PRO_PUBLIC_HOSTNAME} AGENT_DOCKER_VOLUMES_PATH=${AGENT_DOCKER_VOLUMES_PATH}
   environment:
     name: pro/portainer
     url: https://portainer.${PRO_PUBLIC_HOSTNAME}

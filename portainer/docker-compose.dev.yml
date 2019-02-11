@@ -1,42 +1,5 @@
 version: '3.5'
 
-services:
-  agent:
-    deploy:
-      mode: global
-      restart_policy:
-        delay: 10s
-        window: 1m
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          memory: 410M
-
-  portainer:
-    ports:
-      - target: 9000
-        published: 6020
-        mode: host
-    deploy:
-      mode: replicated
-      replicas: 1
-      labels:
-        traefik.port: "9000"
-        traefik.docker.network: traefik-net
-        traefik.frontend.rule: Host:portainer.${PUBLIC_HOSTNAME}
-        traefik.backend: portainer
-      restart_policy:
-        delay: 30s
-        window: 2m
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          memory: 410M
-
 volumes:
   portainer-vol:
-    name: portainer-vol
+    name: ${PORTAINER_VOL_NAME:-portainer-vol}
