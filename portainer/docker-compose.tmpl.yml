@@ -2,27 +2,59 @@ version: '3.5'
 
 services:
   agent:
-    image: portainer/agent
+    image: portainer/agent:${AGENT_IMAGE_TAG:-latest}
     environment:
-      AGENT_CLUSTER_ADDR: tasks.{{.Service.Name}}
-      AGENT_PORT: 9001
-      LOG_LEVEL: error
+      - LOG_LEVEL
+      - AGENT_PORT
+      - AGENT_CLUSTER_ADDR=tasks.{{.Service.Name}}
     networks:
-      - redmic-net
+      - portainer-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${AGENT_DOCKER_VOLUMES_PATH:-/var/lib/docker/volumes}:/var/lib/docker/volumes
+    deploy:
+      mode: global
+      restart_policy:
+        delay: 3s
+        window: 30s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          memory: 64M
 
   portainer:
     image: portainer/portainer:${IMAGE_TAG:-latest}
-    command: -H tcp://tasks.portainer_agent:9001 --tlsskipverify
+    command: -H tcp://tasks.portainer_agent:${AGENT_PORT} --tlsskipverify
     networks:
-      - redmic-net
+      - portainer-net
       - traefik-net
     volumes:
       - portainer-vol:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.frontend.rule: Host:portainer.${PUBLIC_HOSTNAME}
+        traefik.backend: portainer
+        traefik.port: '9000'
+      restart_policy:
+        delay: 30s
+        window: 1m
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 64M
 
 networks:
-  redmic-net:
-    external: true
+  portainer-net:
+    name: ${PORTAINER_NET_NAME:-portainer-net}
+    driver: overlay
+    attachable: ${PORTAINER_NET_ATTACHABLE:-true}
+
   traefik-net:
+    name: ${TRAEFIK_NET_NAME:-traefik-net}
     external: true
