@@ -177,27 +177,6 @@ deploy-minio-dev:
     - dev
   when: manual
 
-deploy-pgadmin-dev:
-  stage: deploy
-  variables:
-    DEPLOY_DIR_NAME: pgadmin
-    SSH_REMOTE: ${DEV_SSH_REMOTE}
-    STACK: postgres
-    SERVICES_TO_CHECK: postgres_pgadmin
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  script:
-    - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PGADMIN_SETUP_EMAIL=${PGADMIN_SETUP_EMAIL}
-      PGADMIN_SETUP_PASSWORD=${PGADMIN_SETUP_PASSWORD} MAIL_USER=${MAIL_USER} MAIL_PASSWORD=${MAIL_PASSWORD}
-      PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
-  environment:
-    name: dev/pgadmin
-    url: https://pgadmin.${DEV_PUBLIC_HOSTNAME}
-  only:
-    - dev
-  when: manual
-
 deploy-portainer-dev:
   stage: deploy
   variables:
