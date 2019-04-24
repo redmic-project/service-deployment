@@ -9,6 +9,8 @@
 * Mail admin
 * Mail client
 * Mail server
+* Minio
+* Portainer
 
 ### Problemas
 
@@ -18,8 +20,3 @@ Limpiar la cola de envio y purgar el buzón de entrada
 postsuper -d ALL
 doveadm expunge -u email@redmic.es mailbox INBOX ALL
 ```
-
-* Minio
-* PGAdmin
-* Portainer
-* Traefik
