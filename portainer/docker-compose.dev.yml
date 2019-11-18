@@ -1,5 +1,0 @@
-version: '3.5'
-
-volumes:
-  portainer-vol:
-    name: ${PORTAINER_VOL_NAME:-portainer-vol}
