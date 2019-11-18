@@ -4,13 +4,11 @@
 
 * Artifactory
 * GitLab-CE
-* GitLab Runner local
-* GitLab Runner remote
+* GitLab Runner
 * Mail admin
 * Mail client
 * Mail server
 * Minio
-* Portainer
 
 ### Problemas
 
