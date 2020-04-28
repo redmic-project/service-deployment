@@ -2,13 +2,11 @@
 
 ## Services
 
-* Artifactory
 * GitLab-CE
 * GitLab Runner
 * Mail admin
 * Mail client
 * Mail server
-* Minio
 
 ### Problemas
 

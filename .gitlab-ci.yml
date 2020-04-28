@@ -10,25 +10,6 @@ variables:
   DOCKER_DRIVER: overlay2
   STATUS_CHECK_DELAY: 60
 
-deploy-artifactory-dev:
-  stage: deploy
-  variables:
-    DEPLOY_DIR_NAME: artifactory
-    SSH_REMOTE: ${DEV_SSH_REMOTE}
-    STACK: artifactory
-    SERVICES_TO_CHECK: artifactory_artifactory
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  script:
-    - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
-  environment:
-    name: dev/artifactory
-    url: https://artifactory.${DEV_PUBLIC_HOSTNAME}
-  only:
-    - dev
-  when: manual
-
 deploy-gitlab-ce-dev:
   stage: deploy
   variables:
@@ -153,26 +134,6 @@ deploy-mail-client-dev:
   environment:
     name: dev/rainloop
     url: https://webmail.${DEV_PUBLIC_HOSTNAME}
-  only:
-    - dev
-  when: manual
-
-deploy-minio-dev:
-  stage: deploy
-  variables:
-    DEPLOY_DIR_NAME: minio
-    SSH_REMOTE: ${DEV_SSH_REMOTE}
-    STACK: minio
-    SERVICES_TO_CHECK: minio_minio
-    IMAGE_TAG: latest
-    COMPOSE_FILE: docker-compose.tmpl.yml:docker-compose.dev.yml
-  script:
-    - >
-      deploy.sh IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE} MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY=${MINIO_SECRET_KEY} PUBLIC_HOSTNAME=${DEV_PUBLIC_HOSTNAME}
-  environment:
-    name: dev/minio
-    url: https://minio.${DEV_PUBLIC_HOSTNAME}
   only:
     - dev
   when: manual
